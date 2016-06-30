@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
 		"phpunit/phpunit": "^5.3",
-		"phpunit/phpunit-selenium": "^3.0"
+		"phpunit/phpunit-selenium": "^3.0",
+        "zf2timo/phpunit-pretty-result-printer": "1.0.0"
     },
     "license": "MIT",
     "authors": [
