@@ -29,5 +29,4 @@ class Unit extends \PHPUnit_Extensions_Selenium2TestCase {
 
 		parent::run($result);
 	}
-
 }
