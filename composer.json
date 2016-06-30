@@ -1,0 +1,15 @@
+{
+    "name": "tigron/skeleton-test",
+    "description": "Testing utilities for Skeleton",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tigron BVBA",
+            "email": "support@tigron.be"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Skeleton\\Test\\": "lib/Skeleton/Test/" }
+    }
+}
