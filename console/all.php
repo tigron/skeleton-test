@@ -32,7 +32,7 @@ class Test_All extends \Skeleton\Console\Command {
 	 * @param OutputInterface $output
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		if (!file_exists(\Skeleton\Database\Migration\Config::$migration_directory)) {
+		if (!file_exists(\Skeleton\Test\Config::$test_directory)) {
 			$output->writeln('<error>Config::$test_directory is not set to a valid directory</error>');
 			return 1;
 		}
