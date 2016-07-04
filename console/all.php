@@ -39,8 +39,6 @@ class Test_All extends \Skeleton\Console\Command {
 
 		$directory = \Skeleton\Test\Config::$test_directory;
 		$phpunit = new \PHPUnit_TextUI_TestRunner;
-		require LIB_PATH . '/external/packages/kujira/phpunit-printer/src/Printer.php';
-
 		$printer = new \PrettyResultPrinter\Printer();
 
 		$test_results = $phpunit->run($phpunit->getTest($directory, '', 'Test.php'), [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
