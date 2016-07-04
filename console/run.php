@@ -1,6 +1,6 @@
 <?php
 /**
- * migration:run command for Skeleton Console
+ * test:run command for Skeleton Console
  *
  * @author David Vandemaele <david@tigron.be>
  */
@@ -40,7 +40,6 @@ class Test_Run extends \Skeleton\Console\Command {
 
 		$directory = \Skeleton\Test\Config::$test_directory;
 		$phpunit = new \PHPUnit_TextUI_TestRunner;
-		require LIB_PATH . '/external/packages/kujira/phpunit-printer/src/Printer.php';
 
 		$printer = new \PrettyResultPrinter\Printer();
 
