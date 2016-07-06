@@ -44,9 +44,6 @@ class Test_Run extends \Skeleton\Console\Command {
 		$printer = new \PrettyResultPrinter\Printer();
 
 		$test_results = $phpunit->run($phpunit->getTest($directory, '', $input->getArgument('name')), [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
-		var_dump($test_results);
-
-
 	}
 
 }

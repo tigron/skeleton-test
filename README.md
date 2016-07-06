@@ -13,8 +13,8 @@ Installation via composer:
 	// Set a directory where tests are located in
 	\Skeleton\Test\Config::$test_directory = $root_path . '/tests';
 
-	// For Selenium test, add browser configurations
-	\Skeleton\Test\Config::add_browser_configuration('firefox', 'localhost', 4444, 30000)
+	// For Selenium test, set the Selenium hub URL
+	\Skeleton\Test\Config::$selenium_hub = 'http://localhost:4444/wd/hub';
 
 	// To run the tests
 	skeleton test:all

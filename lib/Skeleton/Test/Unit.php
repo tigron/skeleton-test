@@ -7,17 +7,37 @@
  */
 
 namespace Skeleton\Test;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\WebDriverBy;
 
-class Unit extends \PHPUnit_Extensions_Selenium2TestCase {
+class Unit extends \PHPUnit_Framework_TestCase {
 
 	/**
-	 * Get the browser configuration
+	 * The webdriver variable
 	 *
 	 * @access public
-	 * @return array $browsers
+	 * @var Facebook\WebDriver\Remote\RemoteWebDriver $webdriver
 	 */
-	public static function browsers() {
-		return Config::$browsers;
+	public $webdriver = null;
+
+	/**
+	 * Create a new testcase
+	 *
+	 * @access public
+	 */
+	public function __construct() {
+		$capabilities = DesiredCapabilities::chrome();
+		$driver = RemoteWebDriver::create(Config::$selenium_hub, $capabilities, 5000);
+		$this->webdriver = $driver;
 	}
 
+	/**
+	 * Destruct the webdriver
+	 *
+	 * @access public
+	 */
+	public function __destruct() {
+		$this->webdriver->quit();
+	}
 }

@@ -16,7 +16,7 @@ class Config {
 	 * @access public
 	 * @var array $browsers
 	 */
-	public static $browsers = [];
+	public static $selenium_hub = 'http://localhost:4444/wd/hub';
 
 	/**
 	 * Test directory
@@ -28,22 +28,4 @@ class Config {
 	 */
 	public static $test_directory = null;
 
-	/**
-	 * Add browser configuration
-	 *
-	 * @access public
-	 * @param string $name
-	 * @param string $host
-	 * @param int $port
-	 * @param int $timeout
-	 */
-	public static function add_browser_configuration($name, $host = 'localhost', $port = 4444, $timeout = 30000) {
-		$configuration = [
-			'browserName' => $name,
-			'host' => $host,
-			'port' => $port,
-			'timeout' => $timeout
-		];
-		self::$browsers[] = $configuration;
-	}
 }

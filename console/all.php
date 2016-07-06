@@ -41,10 +41,7 @@ class Test_All extends \Skeleton\Console\Command {
 		$phpunit = new \PHPUnit_TextUI_TestRunner;
 		$printer = new \PrettyResultPrinter\Printer();
 
-		$test_results = $phpunit->run($phpunit->getTest($directory, '', 'Test.php'), [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
-		var_dump($test_results);
-
-
+		$test_results = $phpunit->run($phpunit->getTest($directory, '', '.php'), [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
 	}
 
 }
