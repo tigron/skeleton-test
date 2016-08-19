@@ -40,10 +40,11 @@ class Test_Run extends \Skeleton\Console\Command {
 
 		$directory = \Skeleton\Test\Config::$test_directory;
 		$phpunit = new \PHPUnit_TextUI_TestRunner;
-
 		$printer = new \PrettyResultPrinter\Printer();
+		$suite = new \PHPUnit_Framework_TestSuite();
+		$suite->addTestSuite( $input->getArgument('name') );
 
-		$test_results = $phpunit->run($phpunit->getTest($directory, '', $input->getArgument('name')), [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
+		$test_results = $phpunit->run($suite, [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
 	}
 
 }

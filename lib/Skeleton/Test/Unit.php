@@ -58,7 +58,6 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	 * @access public
 	 */
 	public static function tearDownAfterClass() {
-		echo "tearDownAfterClass";
 		if (self::$my_webdriver !== null) {
 			self::$my_webdriver->quit();
 			self::$my_webdriver = null;
