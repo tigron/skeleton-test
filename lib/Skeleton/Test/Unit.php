@@ -45,7 +45,7 @@ class Unit extends \PHPUnit_Framework_TestCase {
 			$capabilities = DesiredCapabilities::chrome();
 			$driver = RemoteWebDriver::create(Config::$selenium_hub, $capabilities);
 			self::$my_webdriver = $driver;
-			self::$my_webdriver->manage()->timeouts()->implicitlyWait(1);
+			self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
 		}
 
 		return self::$my_webdriver;
