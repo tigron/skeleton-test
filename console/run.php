@@ -23,6 +23,8 @@ class Test_Run extends \Skeleton\Console\Command {
 		$this->setName('test:run');
 		$this->setDescription('Run a test');
 		$this->addArgument('name', InputArgument::REQUIRED, 'Name of the test');
+		$this->addOption('disable-pretty-printer', null, InputOption::VALUE_NONE, 'Disable PHPUnit\'s PrettyResultPrinter');
+
 	}
 
 	/**
@@ -39,12 +41,18 @@ class Test_Run extends \Skeleton\Console\Command {
 		}
 
 		$directory = \Skeleton\Test\Config::$test_directory;
-		$phpunit = new \PHPUnit_TextUI_TestRunner;
-		$printer = new \PrettyResultPrinter\Printer();
+		$phpunit = new \PHPUnit_TextUI_TestRunner();
+
+
+		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true];
+
+		if (!$input->getOption('disable-pretty-printer')) {
+			$arguments['printer'] = new \PrettyResultPrinter\Printer();
+		}
+
 		$suite = new \PHPUnit_Framework_TestSuite();
 		$suite->addTestSuite( $input->getArgument('name') );
 
-		$test_results = $phpunit->run($suite, [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
+		$test_results = $phpunit->run($suite, $arguments);
 	}
-
 }
