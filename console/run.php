@@ -44,7 +44,7 @@ class Test_Run extends \Skeleton\Console\Command {
 		$phpunit = new \PHPUnit_TextUI_TestRunner();
 
 
-		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true];
+		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
 
 		if (!$input->getOption('disable-pretty-printer')) {
 			$arguments['printer'] = new \PrettyResultPrinter\Printer();

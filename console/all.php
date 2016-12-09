@@ -22,6 +22,7 @@ class Test_All extends \Skeleton\Console\Command {
 	protected function configure() {
 		$this->setName('test:all');
 		$this->setDescription('Run all tests');
+		$this->addOption('disable-pretty-printer', null, InputOption::VALUE_NONE, 'Disable PHPUnit\'s PrettyResultPrinter');
 	}
 
 	/**
@@ -41,7 +42,14 @@ class Test_All extends \Skeleton\Console\Command {
 		$phpunit = new \PHPUnit_TextUI_TestRunner;
 		$printer = new \PrettyResultPrinter\Printer();
 
-		$test_results = $phpunit->run($phpunit->getTest($directory, '', '.php'), [ 'colors' => 'always', 'verbose' => true, 'debug' => false, 'tap' => true, 'printer' => $printer ]);
+		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
+
+		if (!$input->getOption('disable-pretty-printer')) {
+			$arguments['printer'] = new \PrettyResultPrinter\Printer();
+		}
+
+
+		$test_results = $phpunit->run($phpunit->getTest($directory, '', '.php'), $arguments);
 	}
 
 }
