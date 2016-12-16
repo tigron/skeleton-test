@@ -43,7 +43,7 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	public static function get_webdriver() {
 		if (self::$my_webdriver === null) {
 			$capabilities = DesiredCapabilities::chrome();
-			$driver = RemoteWebDriver::create(Config::$selenium_hub, $capabilities);
+			$driver = \Skeleton\Test\Selenium\Webdriver::create(Config::$selenium_hub, $capabilities);
 			self::$my_webdriver = $driver;
 			self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
 		}

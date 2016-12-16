@@ -27,6 +27,7 @@ abstract class Page {
 	 */
 	public function __construct(\Facebook\Webdriver\Webdriver $webdriver) {
 		$this->webdriver = $webdriver;
+		$this->webdriver->page = $this;
 	}
 
 	/**
@@ -44,6 +45,18 @@ abstract class Page {
 	 */
 	public function open() {
 		$this->webdriver->get($this->get_url());
+		$this->check_error();
+	}
+
+	/**
+	 * Check for error and throw exception
+	 *
+	 * @access public
+	 */
+	public function check_error() {
+		if ($this->has_error($error)) {
+			throw new \Exception('Error on page: ' . $error);
+		}
 	}
 
 	/**
