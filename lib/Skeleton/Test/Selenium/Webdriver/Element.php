@@ -8,6 +8,7 @@
 namespace Skeleton\Test\Selenium\Webdriver;
 
 use Facebook\WebDriver\Remote\RemoteWebElement;
+use Facebook\WebDriver\WebDriverBy;
 
 class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 
@@ -28,6 +29,35 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
         parent::click();
 		$this->selenium_webdriver->page->check_error();
     }
+
+	/**
+	 * Find an element
+	 *
+	 * @access public
+	 * @param Facebook\WebDriver\WebDriverBy $by
+	 * @return Skeleton\Test\Selenium\Webdriver\Element $element
+	 */
+	public function findElement(WebDriverBy $by) {
+        $element = parent::findElement($by);
+		$element->selenium_webdriver = $this->selenium_webdriver;
+		return $element;
+	}
+
+	/**
+	 * Find elements
+	 *
+	 * @access public
+	 * @param Facebook\WebDriver\WebDriverBy $by
+	 * @return array $elements
+	 */
+	public function findElements(WebDriverBy $by) {
+        $elements = parent::findElements($by);
+
+        foreach ($elements as $key => $element) {
+			$elements[$key]->selenium_webdriver = $this->selenium_webdriver;
+        }
+		return $elements;
+	}
 
     /**
      * Import the properties
