@@ -52,12 +52,28 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * tearDownAfterScene
+	 * function called after a scene to clean resources used during the scene
+	 *
+	 * @access public
+	 */
+	public static function tearDownAfterScene() {
+	}
+
+	/**
 	 * This method is called after the last case in the test has been run.
 	 * We can safely terminate the webdriver connection here.
 	 *
 	 * @access public
 	 */
 	public static function tearDownAfterClass() {
+		$class = get_called_class();
+
+		try {
+			$class::tearDownAfterScene();
+		} catch(Exception $e) {
+		}
+
 		if (self::$my_webdriver !== null) {
 			self::$my_webdriver->quit();
 			self::$my_webdriver = null;
