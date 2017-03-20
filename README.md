@@ -20,4 +20,4 @@ Installation via composer:
 	skeleton test:all
 
 	// or
-	skeleton test:run MyFirstTest.php
+	skeleton test:run My_First_Test_Class
