@@ -70,6 +70,9 @@ class Unit extends \PHPUnit_Framework_TestCase {
 		$class = get_called_class();
 
 		if (isset(Config::$start_timestamp_filename)) {
+			if (!file_exists(Config::$start_timestamp_filename)) {
+				throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
+			}
 			$timestamp = round(time() - file_get_contents(Config::$start_timestamp_filename));
 			$time = sprintf("%02d:%02d:%02d", ($timestamp/3600), ($timestamp/60%60), $timestamp%60);
 			$timings = [];
@@ -111,6 +114,9 @@ class Unit extends \PHPUnit_Framework_TestCase {
 		$class = get_called_class();
 
 		if (isset(Config::$start_timestamp_filename)) {
+			if (!file_exists(Config::$start_timestamp_filename)) {
+				throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
+			}
 			$timestamp = round(time() - file_get_contents(Config::$start_timestamp_filename));
 			$time = sprintf("%02d:%02d:%02d", ($timestamp/3600), ($timestamp/60%60), $timestamp%60);
 			$timings = [];
