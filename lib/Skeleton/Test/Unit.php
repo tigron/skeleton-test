@@ -14,9 +14,6 @@ use Facebook\WebDriver\WebDriverBy;
 
 class Unit extends \PHPUnit_Framework_TestCase {
 
-	private static $start_timestamp_filename = '/var/tmp/tigron-skeleton-test.start';
-	private static $timings_filename = '/var/tmp/tigron-skeleton-test.json';
-
 	/**
 	 * The webdriver variable
 	 *
@@ -72,12 +69,12 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	public static function setUpBeforeClass() {
 		$class = get_called_class();
 
-		if (file_exists(self::$start_timestamp_filename)) {
-			$timestamp = round(time() - file_get_contents(self::$start_timestamp_filename));
+		if (isset(Config::$start_timestamp_filename)) {
+			$timestamp = round(time() - file_get_contents(Config::$start_timestamp_filename));
 			$time = sprintf("%02d:%02d:%02d", ($timestamp/3600), ($timestamp/60%60), $timestamp%60);
 			$timings = [];
-			if (file_exists(self::$timings_filename)) {
-				$timings = json_decode(file_get_contents(self::$timings_filename), true);
+			if (file_exists(Config::$timings_filename)) {
+				$timings = json_decode(file_get_contents(Config::$timings_filename), true);
 			}
 			$data = [];
 			if (isset($timings[$class])) {
@@ -86,7 +83,7 @@ class Unit extends \PHPUnit_Framework_TestCase {
 			$data['start_timestamp'] = $timestamp;
 			$data['start_time'] = $time;
 			$timings[$class] = $data;
-			file_put_contents(self::$timings_filename, json_encode($timings));
+			file_put_contents(Config::$timings_filename, json_encode($timings));
 		}
 
 		try {
@@ -113,12 +110,12 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	public static function tearDownAfterClass() {
 		$class = get_called_class();
 
-		if (file_exists(self::$start_timestamp_filename)) {
-			$timestamp = round(time() - file_get_contents(self::$start_timestamp_filename));
+		if (isset(Config::$start_timestamp_filename)) {
+			$timestamp = round(time() - file_get_contents(Config::$start_timestamp_filename));
 			$time = sprintf("%02d:%02d:%02d", ($timestamp/3600), ($timestamp/60%60), $timestamp%60);
 			$timings = [];
-			if (file_exists(self::$timings_filename)) {
-				$timings = json_decode(file_get_contents(self::$timings_filename), true);
+			if (file_exists(Config::$timings_filename)) {
+				$timings = json_decode(file_get_contents(Config::$timings_filename), true);
 			}
 			$data = [];
 			if (isset($timings[$class])) {
@@ -127,7 +124,7 @@ class Unit extends \PHPUnit_Framework_TestCase {
 			$data['stop_timestamp'] = $timestamp;
 			$data['stop_time'] = $time;
 			$timings[$class] = $data;
-			file_put_contents(self::$timings_filename, json_encode($timings));
+			file_put_contents(Config::$timings_filename, json_encode($timings));
 		}
 
 		try {
