@@ -4,6 +4,7 @@
  *
  * @author Christophe Gosiau <christophe@tigron.be>
  * @author Gerry Demaret <gerry@tigron.be>
+ * @author Lionel Laffineur <lionel@tigron.be>
  */
 
 namespace Skeleton\Test;
@@ -12,6 +13,9 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
 class Unit extends \PHPUnit_Framework_TestCase {
+
+	private static $start_timestamp_filename = '/var/tmp/tigron-skeleton-test.start';
+	private static $timings_filename = '/var/tmp/tigron-skeleton-test.json';
 
 	/**
 	 * The webdriver variable
@@ -52,6 +56,46 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * setupBeforeScene
+	 * function called before a scene to init resources used in the scene
+	 *
+	 * @access public
+	 */
+	public static function setupBeforeScene() {
+	}
+
+	/**
+	 * This method is called before the first case in the test.
+	 *
+	 * @access public
+	 */
+	public static function setUpBeforeClass() {
+		$class = get_called_class();
+
+		if (file_exists(self::$start_timestamp_filename)) {
+			$timestamp = round(time() - file_get_contents(self::$start_timestamp_filename));
+			$time = sprintf("%02d:%02d:%02d", ($timestamp/3600), ($timestamp/60%60), $timestamp%60);
+			$timings = [];
+			if (file_exists(self::$timings_filename)) {
+				$timings = json_decode(file_get_contents(self::$timings_filename), true);
+			}
+			$data = [];
+			if (isset($timings[$class])) {
+				$data = $timings[$class];
+			}
+			$data['start_timestamp'] = $timestamp;
+			$data['start_time'] = $time;
+			$timings[$class] = $data;
+			file_put_contents(self::$timings_filename, json_encode($timings));
+		}
+
+		try {
+			$class::setupBeforeScene();
+		} catch(Exception $e) {
+		}
+	}
+
+	/**
 	 * tearDownAfterScene
 	 * function called after a scene to clean resources used during the scene
 	 *
@@ -68,6 +112,23 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	 */
 	public static function tearDownAfterClass() {
 		$class = get_called_class();
+
+		if (file_exists(self::$start_timestamp_filename)) {
+			$timestamp = round(time() - file_get_contents(self::$start_timestamp_filename));
+			$time = sprintf("%02d:%02d:%02d", ($timestamp/3600), ($timestamp/60%60), $timestamp%60);
+			$timings = [];
+			if (file_exists(self::$timings_filename)) {
+				$timings = json_decode(file_get_contents(self::$timings_filename), true);
+			}
+			$data = [];
+			if (isset($timings[$class])) {
+				$data = $timings[$class];
+			}
+			$data['stop_timestamp'] = $timestamp;
+			$data['stop_time'] = $time;
+			$timings[$class] = $data;
+			file_put_contents(self::$timings_filename, json_encode($timings));
+		}
 
 		try {
 			$class::tearDownAfterScene();
