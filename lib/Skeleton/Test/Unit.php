@@ -43,7 +43,12 @@ class Unit extends \PHPUnit_Framework_TestCase {
 	 */
 	public static function get_webdriver() {
 		if (self::$my_webdriver === null) {
+			$chromeOptions = new \Facebook\WebDriver\Chrome\ChromeOptions();
+			$chromeOptions->addArguments(['no-sandbox']);
+
 			$capabilities = DesiredCapabilities::chrome();
+			$capabilities->setCapability(\Facebook\WebDriver\Chrome\ChromeOptions::CAPABILITY, $chromeOptions);
+
 			$driver = \Skeleton\Test\Selenium\Webdriver::create(Config::$selenium_hub, $capabilities);
 			self::$my_webdriver = $driver;
 			self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
