@@ -28,6 +28,7 @@ abstract class Page {
 	public function __construct(\Facebook\Webdriver\Webdriver $webdriver) {
 		$this->webdriver = $webdriver;
 		$this->webdriver->page = $this;
+		$this->webdriver->manage()->window()->maximize();
 	}
 
 	/**
