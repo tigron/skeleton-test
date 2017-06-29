@@ -49,7 +49,12 @@ class Unit extends \PHPUnit_Framework_TestCase {
 			$capabilities = DesiredCapabilities::chrome();
 			$capabilities->setCapability(\Facebook\WebDriver\Chrome\ChromeOptions::CAPABILITY, $chromeOptions);
 
-			$driver = \Skeleton\Test\Selenium\Webdriver::create(Config::$selenium_hub, $capabilities);
+			$driver = \Skeleton\Test\Selenium\Webdriver::create(
+				Config::$selenium_hub, 
+				$capabilities, 
+				60 * 1000, // Connection timeout in miliseconds
+				60 * 1000, // Request timeout in miliseconds				
+			);
 			self::$my_webdriver = $driver;
 			self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
 		}
