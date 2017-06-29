@@ -53,7 +53,7 @@ class Unit extends \PHPUnit_Framework_TestCase {
 				Config::$selenium_hub, 
 				$capabilities, 
 				60 * 1000, // Connection timeout in miliseconds
-				60 * 1000, // Request timeout in miliseconds				
+				60 * 1000  // Request timeout in miliseconds				
 			);
 			self::$my_webdriver = $driver;
 			self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
