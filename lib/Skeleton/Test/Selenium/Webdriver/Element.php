@@ -9,6 +9,7 @@ namespace Skeleton\Test\Selenium\Webdriver;
 
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverExpectedCondition;
 
 class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 
@@ -26,6 +27,12 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 * @access public
 	 */
     public function click() {
+    	$this->selenium_webdriver->wait(10, 2000)->until(
+    		WebDriverExpectedCondition::visibilityOf($this)
+    	);
+    	if (!$this->isEnabled()) {
+    		throw new Exception('The element you try to click is not enabled');
+    	}
         parent::click();
 		$this->selenium_webdriver->page->check_error();
     }
