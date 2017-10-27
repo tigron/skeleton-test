@@ -96,7 +96,7 @@ class Unit extends \PHPUnit_Framework_TestCase {
 			$data['start_timestamp'] = $timestamp;
 			$data['start_time'] = $time;
 			$timings[$class] = $data;
-			file_put_contents(Config::$timings_filename, json_encode($timings));
+			file_put_contents(Config::$timings_filename, json_encode($timings, JSON_PRETTY_PRINT));
 		}
 
 		try {
