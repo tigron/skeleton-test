@@ -31,7 +31,7 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
     		WebDriverExpectedCondition::visibilityOf($this)
     	);
     	if (!$this->isEnabled()) {
-    		throw new Exception('The element you try to click is not enabled');
+    		throw new \Exception('The element you try to click is not enabled');
     	}
         parent::click();
 		$this->selenium_webdriver->page->check_error();
