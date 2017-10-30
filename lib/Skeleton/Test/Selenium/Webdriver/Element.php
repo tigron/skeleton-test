@@ -34,6 +34,18 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
     		throw new \Exception('The element you try to click is not enabled');
     	}
         parent::click();
+        $webdriver = $this->selenium_webdriver;
+        $this->selenium_webdriver->wait()->until(
+        	function () use ($webdriver) {
+				$state = $webdriver->executeScript("return document.readyState;", [ ]);
+				if ($state == 'complete') {
+					return true;
+				} else {
+					return false;
+				}
+        	},
+        	'Error: document doesn\'t enter readyState after click'
+        );
 		$this->selenium_webdriver->page->check_error();
     }
 
