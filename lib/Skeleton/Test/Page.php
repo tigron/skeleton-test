@@ -65,29 +65,26 @@ abstract class Page {
 	 * Checks if the current page contains an error
 	 *
 	 * @access public
-	 * @param string $error Optional string which will contain the error message if there was any
 	 * @return bool
 	 */
 	public function has_error(&$error = '') {
+
 		$error_messages = [
-			'/<b>Fatal error<\/b>: (.*)/',
-			'/<b>Parse error<\/b>: (.*)/',
-			'/<b>Warning<\/b>: (.*)/',
-			'/<b>Notice<\/b>: (.*)/'
+			'>FatalError</span>',
+			'>ParseError</span>',
+			'>Warning</span>',
+			'>Notice</span>'
 		];
 
-		$html = $this->webdriver->getPageSource();
 		foreach ($error_messages as $error_message) {
-			preg_match($error_message, $html, $output_array);
-			if (count($output_array) > 0) {
-				$error = trim(strip_tags($output_array[0]));
+			$script = "return document.body.innerHTML.indexOf('" . $error_message . "');";
+			$return = $this->webdriver->executeScript($script, []);
+			if ($return != -1) {
+				$error = $error_message;
 				return true;
 			}
 		}
 
-		if (class_exists('Skeleton\Error\Detector')) {
-			return \Skeleton\Error\Detector::detect($html, $error);
-		}
 
 		return false;
 	}
