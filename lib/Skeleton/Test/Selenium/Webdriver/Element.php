@@ -34,10 +34,6 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
     		throw new \Exception('The element you try to click is not enabled');
     	}
 
-		$this->selenium_webdriver->wait(10, 2000)->until(
-			WebDriverExpectedCondition::elementToBeClickable($this)
-		);
-
         parent::click();
         $webdriver = $this->selenium_webdriver;
         $this->selenium_webdriver->wait()->until(
