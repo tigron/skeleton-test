@@ -140,7 +140,7 @@ class Unit extends \PHPUnit_Framework_TestCase {
 			$data['stop_timestamp'] = $timestamp;
 			$data['stop_time'] = $time;
 			$timings[$class] = $data;
-			file_put_contents(Config::$timings_filename, json_encode($timings));
+			file_put_contents(Config::$timings_filename, json_encode($timings, JSON_PRETTY_PRINT));
 		}
 
 		try {
