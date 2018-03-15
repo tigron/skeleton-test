@@ -48,4 +48,12 @@ class Config {
 	 * @var string $timings_filename
 	 */
 	public static $timings_filename = null;
+
+	/**
+	 * Default implicit timeout when waiting for an object in the dom
+	 *
+	 * @access public
+	 * @var int $default_implicit_timeout
+	 */
+	public static $default_implicit_timeout = 5;
 }

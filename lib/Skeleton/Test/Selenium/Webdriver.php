@@ -26,12 +26,18 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
 	 * @param Facebook\WebDriver\WebDriverBy $by
 	 * @return Skeleton\Test\Selenium\Webdriver\Element $element
 	 */
-	public function findElement(WebDriverBy $by) {
+	public function findElement(WebDriverBy $by, $timeout = null) {
+		if ($timeout != null) {
+			$this->manage()->timeouts()->implicitlyWait($timeout);
+		}
         $src = parent::findElement($by);
 		$dest = new \Skeleton\Test\Selenium\Webdriver\Element($this->executeMethod, $this->sessionID);
 		$dest->import($src);
 		$dest->selenium_webdriver = $this;
 
+		if ($timeout != null) {
+			$this->manage()->timeouts()->implicitlyWait(Config::$default_implicit_timeout);
+		}
 		return $dest;
 	}
 
