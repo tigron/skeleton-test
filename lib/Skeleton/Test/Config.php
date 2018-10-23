@@ -56,4 +56,12 @@ class Config {
 	 * @var int $default_implicit_timeout
 	 */
 	public static $default_implicit_timeout = 5;
+
+	/**
+	 * Intense test count
+	 *
+	 * @access public
+	 * @var int $default_intense_count
+	 */
+	public static $intense_count = 10;
 }
