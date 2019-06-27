@@ -7,7 +7,10 @@
 		"facebook/webdriver": "^1.1",
 		"zf2timo/phpunit-pretty-result-printer": "1.0.0"
     },
-    "license": "MIT",
+    "suggest": {
+		"tigron/skeleton-file": ">=0.3.0",
+    },
+   "license": "MIT",
     "authors": [
         {
             "name": "Tigron BVBA",

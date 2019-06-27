@@ -23,5 +23,14 @@ Installation via composer:
 	// To run the tests
 	skeleton test:all
 
-	// or
+	// To run a single test
 	skeleton test:run My_First_Test_Class
+
+	// To intensively (10x) run a single test
+	skeleton test:intense My_First_Test_Class
+
+	// To use files in the tests (only if skeleton-file is available)
+	skeleton test:file add identifier /var/www/mysite/myfile.txt
+	skeleton test:file get identifier /var/www/mysite/myfile.txt
+	skeleton test:file delete identifier
+	skeleton test:file list
