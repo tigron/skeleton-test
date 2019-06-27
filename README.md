@@ -30,7 +30,7 @@ Installation via composer:
 	skeleton test:intense My_First_Test_Class
 
 	// To use files in the tests (only if skeleton-file is available)
-	skeleton test:file add identifier /var/www/mysite/myfile.txt
-	skeleton test:file get identifier /var/www/mysite/myfile.txt
+	skeleton test:file add identifier /var/www/mysite/my_file.txt
+	skeleton test:file get identifier /var/www/mysite/target_file.txt
 	skeleton test:file delete identifier
 	skeleton test:file list
