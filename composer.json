@@ -8,7 +8,7 @@
 		"zf2timo/phpunit-pretty-result-printer": "1.0.0"
     },
     "suggest": {
-		"tigron/skeleton-file": ">=0.3.0",
+		"tigron/skeleton-file": ">=0.3.0"
     },
    "license": "MIT",
     "authors": [
