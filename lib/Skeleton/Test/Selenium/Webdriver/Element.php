@@ -55,11 +55,19 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 *
 	 * @access public
 	 * @param Facebook\WebDriver\WebDriverBy $by
+	 * @param $timeout
 	 * @return Skeleton\Test\Selenium\Webdriver\Element $element
 	 */
-	public function findElement(WebDriverBy $by) {
-        $element = parent::findElement($by);
+	public function findElement(WebDriverBy $by, $timeout = null) {
+		if ($timeout != null) {
+			$this->manage()->timeouts()->implicitlyWait($timeout);
+		}
+		$element = parent::findElement($by);
 		$element->selenium_webdriver = $this->selenium_webdriver;
+
+		if ($timeout != null) {
+			$this->manage()->timeouts()->implicitlyWait(Config::$default_implicit_timeout);
+		}
 		return $element;
 	}
 
@@ -70,12 +78,19 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 * @param Facebook\WebDriver\WebDriverBy $by
 	 * @return array $elements
 	 */
-	public function findElements(WebDriverBy $by) {
+	public function findElements(WebDriverBy $by, $timeout = null) {
+		if ($timeout != null) {
+			$this->manage()->timeouts()->implicitlyWait($timeout);
+		}
         $elements = parent::findElements($by);
 
         foreach ($elements as $key => $element) {
 			$elements[$key]->selenium_webdriver = $this->selenium_webdriver;
         }
+
+		if ($timeout != null) {
+			$this->manage()->timeouts()->implicitlyWait(Config::$default_implicit_timeout);
+		}
 		return $elements;
 	}
 
