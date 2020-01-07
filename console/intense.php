@@ -41,19 +41,20 @@ class Test_Intense extends \Skeleton\Console\Command {
 		}
 
 		$directory = \Skeleton\Test\Config::$test_directory;
-		$phpunit = new \PHPUnit_TextUI_TestRunner();
 
-
-		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
-
-		if (!$input->getOption('disable-pretty-printer')) {
-			$arguments['printer'] = new \PrettyResultPrinter\Printer();
-		}
-
-		$suite = new \PHPUnit_Framework_TestSuite();
 		for ($i = 0; $i < \Skeleton\Test\Config::$intense_count; $i++) {
+			printf("%d) ", $i);
+			$phpunit = new \PHPUnit_TextUI_TestRunner();
+
+			$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
+
+			if (!$input->getOption('disable-pretty-printer')) {
+				$arguments['printer'] = new \PrettyResultPrinter\Printer();
+			}
+
+			$suite = new \PHPUnit_Framework_TestSuite();
 			$suite->addTestSuite( $input->getArgument('name') );
+			$test_results = $phpunit->doRun($suite, $arguments, false);
 		}
-		$test_results = $phpunit->run($suite, $arguments);
 	}
 }
