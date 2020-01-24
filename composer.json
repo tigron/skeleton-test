@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
 		"phpunit/phpunit": "^5.3",
-		"facebook/webdriver": "^1.1",
+		"php-webdriver/webdriver": "^1.1",
 		"zf2timo/phpunit-pretty-result-printer": "1.0.0"
     },
     "suggest": {
