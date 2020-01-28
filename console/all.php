@@ -45,7 +45,7 @@ class Test_All extends \Skeleton\Console\Command {
 		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
 
 		if (!$input->getOption('disable-pretty-printer')) {
-			$arguments['printer'] = new \PrettyResultPrinter\Printer();
+			$arguments['printer'] = new \PrettyResultPrinter\Printer(null, false, true, false, 150);
 		}
 
 
