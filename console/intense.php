@@ -44,7 +44,7 @@ class Test_Intense extends \Skeleton\Console\Command {
 
 		for ($i = 0; $i < \Skeleton\Test\Config::$intense_count; $i++) {
 			printf("%d) ", $i);
-			$phpunit = new \PHPUnit_TextUI_TestRunner();
+			$phpunit = new \PHPUnit\TextUI\TestRunner();
 
 			$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
 
@@ -52,7 +52,7 @@ class Test_Intense extends \Skeleton\Console\Command {
 				$arguments['printer'] = new \PrettyResultPrinter\Printer();
 			}
 
-			$suite = new \PHPUnit_Framework_TestSuite();
+			$suite = new \PHPUnit\Framework\TestSuite();
 			$suite->addTestSuite( $input->getArgument('name') );
 			$test_results = $phpunit->doRun($suite, $arguments, false);
 		}

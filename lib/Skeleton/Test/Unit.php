@@ -12,7 +12,7 @@ use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
-class Unit extends \PHPUnit_Framework_TestCase {
+class Unit extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The webdriver variable

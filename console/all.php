@@ -39,7 +39,7 @@ class Test_All extends \Skeleton\Console\Command {
 		}
 
 		$directory = \Skeleton\Test\Config::$test_directory;
-		$phpunit = new \PHPUnit_TextUI_TestRunner;
+		$phpunit = new \PHPUnit\TextUI\TestRunner;
 		$printer = new \PrettyResultPrinter\Printer();
 
 		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];

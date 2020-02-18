@@ -41,7 +41,7 @@ class Test_Run extends \Skeleton\Console\Command {
 		}
 
 		$directory = \Skeleton\Test\Config::$test_directory;
-		$phpunit = new \PHPUnit_TextUI_TestRunner();
+		$phpunit = new \PHPUnit\TextUI\TestRunner();
 
 
 		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
@@ -50,7 +50,7 @@ class Test_Run extends \Skeleton\Console\Command {
 			$arguments['printer'] = new \PrettyResultPrinter\Printer(null, false, true, false, 150);
 		}
 
-		$suite = new \PHPUnit_Framework_TestSuite();
+		$suite = new \PHPUnit\Framework\TestSuite();
 		$suite->addTestSuite( $input->getArgument('name') );
 
 		$test_results = $phpunit->run($suite, $arguments);
