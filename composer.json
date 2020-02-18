@@ -3,7 +3,7 @@
     "description": "Testing utilities for Skeleton",
     "type": "library",
     "require": {
-		"phpunit/phpunit": "^5.3",
+		"phpunit/phpunit": "^6.5",
 		"php-webdriver/webdriver": "^1.1",
 		"zf2timo/phpunit-pretty-result-printer": "1.0.0"
     },
