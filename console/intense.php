@@ -49,7 +49,7 @@ class Test_Intense extends \Skeleton\Console\Command {
 			$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
 
 			if (!$input->getOption('disable-pretty-printer')) {
-				$arguments['printer'] = new \PrettyResultPrinter\Printer();
+				$arguments['printer'] = new \zf2timo\PrettyResultPrinter\Printer();
 			}
 
 			$suite = new \PHPUnit\Framework\TestSuite();
