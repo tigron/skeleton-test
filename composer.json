@@ -5,7 +5,7 @@
     "require": {
 		"phpunit/phpunit": "^6.5",
 		"php-webdriver/webdriver": "^1.1",
-		"zf2timo/phpunit-pretty-result-printer": "1.0.0"
+		"zf2timo/phpunit-pretty-result-printer": "2.0.0"
     },
     "suggest": {
 		"tigron/skeleton-file": ">=0.3.0"
