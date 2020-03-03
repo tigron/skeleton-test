@@ -45,19 +45,19 @@ class Test_File extends \Skeleton\Console\Command {
 			$identifier = $input->getArgument('identifier');
 			if ($identifier == null || $identifier == '') {
 				$output->writeln('<error>Identifier parameter not provided</error>');
-				return;
+				return 1;
 			}
 			$path = $input->getArgument('path');
 			if ($path == null || $path == '') {
 				$output->writeln('<error>Path parameter not provided</error>');
-				return;
+				return 1;
 			}
 			$test_data_file = \Skeleton\Test\Test\Data\File::add_by_path($identifier, $path);
 		} else if ($action == 'delete') {
 			$identifier = $input->getArgument('identifier');
 			if ($identifier == null || $identifier == '') {
 				$output->writeln('<error>Identifier parameter not provided</error>');
-				return;
+				return 1;
 			}
 			$test_data_file = \Skeleton\Test\Test\Data\File::get_by_identifier($identifier);
 			$test_data_file->delete();
@@ -65,12 +65,12 @@ class Test_File extends \Skeleton\Console\Command {
 			$identifier = $input->getArgument('identifier');
 			if ($identifier == null || $identifier == '') {
 				$output->writeln('<error>Identifier parameter not provided</error>');
-				return;
+				return 1;
 			}
 			$path = $input->getArgument('path');
 			if ($path == null || $path == '') {
 				$output->writeln('<error>Path parameter not provided</error>');
-				return;
+				return 1;
 			}
 			$test_data_file = \Skeleton\Test\Test\Data\File::get_by_identifier($identifier);
 			file_put_contents($path, $test_data_file->file->get_contents());
@@ -91,5 +91,6 @@ class Test_File extends \Skeleton\Console\Command {
 		} else {
 			$output->writeln('<error>Invalid action [add|list|remove]</error>');
 		}
+		return 0;
 	}
 }

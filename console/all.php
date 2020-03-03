@@ -50,6 +50,7 @@ class Test_All extends \Skeleton\Console\Command {
 
 
 		$test_results = $phpunit->run($phpunit->getTest($directory, '', '.php'), $arguments);
+		return 0;
 	}
 
 }

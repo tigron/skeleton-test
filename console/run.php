@@ -54,5 +54,6 @@ class Test_Run extends \Skeleton\Console\Command {
 		$suite->addTestSuite( $input->getArgument('name') );
 
 		$test_results = $phpunit->run($suite, $arguments);
+		return 0;
 	}
 }

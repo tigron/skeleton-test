@@ -55,6 +55,7 @@ class Test_Intense extends \Skeleton\Console\Command {
 			$suite = new \PHPUnit\Framework\TestSuite();
 			$suite->addTestSuite( $input->getArgument('name') );
 			$test_results = $phpunit->doRun($suite, $arguments, false);
+			return 0;
 		}
 	}
 }
