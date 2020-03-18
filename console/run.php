@@ -51,7 +51,10 @@ class Test_Run extends \Skeleton\Console\Command {
 		}
 
 		$suite = new \PHPUnit\Framework\TestSuite();
-		$suite->addTestSuite( $input->getArgument('name') );
+		$names = explode(',', $input->getArgument('name'));
+		foreach ($names as $name) {
+			$suite->addTestSuite($name);
+		}
 
 		$test_results = $phpunit->run($suite, $arguments);
 		return 0;
