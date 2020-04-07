@@ -43,7 +43,7 @@ class Test_Intense extends \Skeleton\Console\Command {
 		$directory = \Skeleton\Test\Config::$test_directory;
 
 		for ($i = 0; $i < \Skeleton\Test\Config::$intense_count; $i++) {
-			printf("%d) ", $i);
+			printf("(%d) ", $i);
 			$phpunit = new \PHPUnit\TextUI\TestRunner();
 
 			$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
