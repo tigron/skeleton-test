@@ -44,10 +44,33 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	public static function get_webdriver() {
 		if (self::$my_webdriver === null) {
 			$chromeOptions = new \Facebook\WebDriver\Chrome\ChromeOptions();
-			$chromeOptions->addArguments(['no-sandbox']);
+			$arguments = [
+//				'--headless',
+				'--no-sandbox',
+				'--disable-gpu',
+				'--disable-infobars',
+				'--enable-automation',
+				'--suppress-message-center-popups',
+				'--start-maximized',
+				'--test-type',
+			];
+			$chromeOptions->addArguments($arguments);
+			$chromeOptions->setExperimentalOption('excludeSwitches', ['enable-automation']);
+			$chromeOptions->setExperimentalOption('useAutomationExtension', false);			
+			$prefs = ["profile.default_content_setting_values.notifications" => 2];
+		    $chromeOptions->setExperimentalOption("prefs", $prefs);
 
 			$capabilities = DesiredCapabilities::chrome();
 			$capabilities->setCapability(\Facebook\WebDriver\Chrome\ChromeOptions::CAPABILITY, $chromeOptions);
+
+		    // this are the lines of code you need to add
+		    $custom_capability = [
+				'args' => $arguments,
+		    	'excludeSwitches' => [ 'enable-automation' ],
+				'useAutomationExtension' => false,
+		    ];
+		    $capabilities->setCapability('goog:chromeOptions', $custom_capability);
+
 
 			$driver = \Skeleton\Test\Selenium\Webdriver::create(
 				Config::$selenium_hub, 
