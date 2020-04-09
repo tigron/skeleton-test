@@ -12,6 +12,14 @@ namespace Skeleton\Test;
 class Config {
 
 	/**
+	 * Browser
+	 *
+	 * @access public
+	 * @var string $browser
+	 */
+	public static $browser = 'firefox';
+
+	/**
 	 * Browsers
 	 *
 	 * @access public

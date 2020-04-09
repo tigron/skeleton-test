@@ -43,45 +43,56 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	 */
 	public static function get_webdriver() {
 		if (self::$my_webdriver === null) {
-			$chromeOptions = new \Facebook\WebDriver\Chrome\ChromeOptions();
-			$arguments = [
-//				'--headless',
-				'--no-sandbox',
-				'--disable-gpu',
-				'--disable-infobars',
-				'--enable-automation',
-				'--suppress-message-center-popups',
-				'--start-maximized',
-				'--test-type',
-			];
-			$chromeOptions->addArguments($arguments);
-			$chromeOptions->setExperimentalOption('excludeSwitches', ['enable-automation']);
-			$chromeOptions->setExperimentalOption('useAutomationExtension', false);			
-			$prefs = ["profile.default_content_setting_values.notifications" => 2];
-		    $chromeOptions->setExperimentalOption("prefs", $prefs);
+			if (Config::$browser == 'chrome') {
+				$chromeOptions = new \Facebook\WebDriver\Chrome\ChromeOptions();
+				$arguments = [
+	//				'--headless',
+					'--no-sandbox',
+					'--disable-gpu',
+					'--disable-infobars',
+					'--enable-automation',
+					'--suppress-message-center-popups',
+					'--start-maximized',
+					'--test-type',
+				];
+				$chromeOptions->addArguments($arguments);
+				$chromeOptions->setExperimentalOption('excludeSwitches', ['enable-automation']);
+				$chromeOptions->setExperimentalOption('useAutomationExtension', false);
+				$prefs = ["profile.default_content_setting_values.notifications" => 2];
+				$chromeOptions->setExperimentalOption("prefs", $prefs);
 
-			$capabilities = DesiredCapabilities::chrome();
-			$capabilities->setCapability(\Facebook\WebDriver\Chrome\ChromeOptions::CAPABILITY, $chromeOptions);
+				$capabilities = DesiredCapabilities::chrome();
+				$capabilities->setCapability(\Facebook\WebDriver\Chrome\ChromeOptions::CAPABILITY, $chromeOptions);
 
-		    // this are the lines of code you need to add
-		    $custom_capability = [
-				'args' => $arguments,
-		    	'excludeSwitches' => [ 'enable-automation' ],
-				'useAutomationExtension' => false,
-		    ];
-		    $capabilities->setCapability('goog:chromeOptions', $custom_capability);
+				// this are the lines of code you need to add
+				$custom_capability = [
+					'args' => $arguments,
+					'excludeSwitches' => [ 'enable-automation' ],
+					'useAutomationExtension' => false,
+				];
+				$capabilities->setCapability('goog:chromeOptions', $custom_capability);
 
 
-			$driver = \Skeleton\Test\Selenium\Webdriver::create(
-				Config::$selenium_hub, 
-				$capabilities, 
-				60 * 1000, // Connection timeout in miliseconds
-				60 * 1000  // Request timeout in miliseconds				
-			);
-			self::$my_webdriver = $driver;
-			self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
+				$driver = \Skeleton\Test\Selenium\Webdriver::create(
+					Config::$selenium_hub,
+					$capabilities,
+					60 * 1000, // Connection timeout in miliseconds
+					60 * 1000  // Request timeout in miliseconds
+				);
+				self::$my_webdriver = $driver;
+				self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
+			} else if (Config::$browser == 'firefox') {
+				$profile = new \Facebook\WebDriver\Firefox\FirefoxProfile();
+				$profile->setPreference('browser.startup.homepage', 'https://github.com/php-webdriver/php-webdriver/');
+				$capabilities = DesiredCapabilities::firefox();
+				$capabilities->setCapability(\Facebook\WebDriver\Firefox\FirefoxDriver::PROFILE, $profile);
+				$driver = \Skeleton\Test\Selenium\Webdriver::create(Config::$selenium_hub, $capabilities);
+				self::$my_webdriver = $driver;
+				self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
+			} else {
+				throw new Exception("Unknown browser '" . Config::$browser . "'");
+			}
 		}
-
 		return self::$my_webdriver;
 	}
 
