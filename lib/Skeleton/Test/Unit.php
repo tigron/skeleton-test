@@ -82,8 +82,35 @@ class Unit extends \PHPUnit\Framework\TestCase {
 				self::$my_webdriver = $driver;
 				self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
 			} else if (Config::$browser == 'firefox') {
+				$mime_types = [
+					'text/plain',
+					'application/vnd.ms-excel',
+					'text/csv',
+					'application/csv',
+					'text/comma-separated-values',
+					'application/download',
+					'application/octet-stream',
+					'binary/octet-stream',
+					'application/binary',
+					'application/x-unknown',
+					'application/pdf',
+					'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				];
 				$profile = new \Facebook\WebDriver\Firefox\FirefoxProfile();
-				$profile->setPreference('browser.startup.homepage', 'https://github.com/php-webdriver/php-webdriver/');
+				$profile->setPreference('browser.startup.homepage', 'about:blank');
+				$profile->setPreference('browser.download.folderList', 0);
+				$profile->setPreference('browser.download.manager.showWhenStarting', false);
+				$profile->setPreference('browser.download.dir', '/tmp');
+				$profile->setPreference('browser.helperApps.alwaysAsk.force', false);
+				$profile->setPreference('browser.download.manager.alertOnEXEOpen', false);
+				$profile->setPreference('browser.download.manager.focusWhenStarting', false);
+				$profile->setPreference('browser.download.manager.useWindow', false);
+				$profile->setPreference('browser.download.manager.showAlertOnComplete', false);
+				$profile->setPreference('browser.download.manager.closeWhenDone', true);
+				$profile->setPreference('browser.download.panel.shown', false);
+				$profile->setPreference('pdfjs.disabled', true);
+				$profile->setPreference('browser.helperApps.neverAsk.openFile', implode($mime_types));
+				$profile->setPreference('browser.helperApps.neverAsk.saveToDisk', implode($mime_types));
 				$capabilities = DesiredCapabilities::firefox();
 				$capabilities->setCapability(\Facebook\WebDriver\Firefox\FirefoxDriver::PROFILE, $profile);
 				$driver = \Skeleton\Test\Selenium\Webdriver::create(Config::$selenium_hub, $capabilities);
