@@ -41,24 +41,31 @@ class Test_Intense extends \Skeleton\Console\Command {
 		}
 
 		$directory = \Skeleton\Test\Config::$test_directory;
+		$phpunit = new \PHPUnit\TextUI\TestRunner();
 
-		for ($i = 0; $i < \Skeleton\Test\Config::$intense_count; $i++) {
-			printf("(%d) ", $i);
-			$phpunit = new \PHPUnit\TextUI\TestRunner();
+		$arguments = [ 
+			'colors' => 'always', 
+			'verbose' => false, 
+			'debug' => false, 
+			'loadedExtensions' => [], 
+			'notLoadedExtensions' => [],
+			'extensions' => [],
+			'warnings' => [],
+			'stderr' => true,
+			'repeat' => \Skeleton\Test\Config::$intense_count,
+		];
 
-			$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
-
-			if (!$input->getOption('disable-pretty-printer')) {
-				$arguments['printer'] = new \zf2timo\PrettyResultPrinter\Printer();
-			}
-
-			$suite = new \PHPUnit\Framework\TestSuite();
-			$names = explode(',', $input->getArgument('name'));
-			foreach ($names as $name) {
-				$suite->addTestSuite($name);
-			}
-			$test_results = $phpunit->doRun($suite, $arguments, false);
+		if (!$input->getOption('disable-pretty-printer')) {
+			$arguments['printer'] = new \Sempro\PHPUnitPrettyPrinter\PrettyPrinter(null, false, 'always', false, 150);
 		}
+
+		$suite = new \PHPUnit\Framework\TestSuite();
+		$names = explode(',', $input->getArgument('name'));
+		foreach ($names as $name) {
+			$suite->addTestSuite($name);
+		}
+
+		$test_results = $phpunit->run($suite, $arguments);
 		return 0;
 	}
 }

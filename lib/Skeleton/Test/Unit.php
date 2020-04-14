@@ -137,7 +137,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	 *
 	 * @access public
 	 */
-	public static function setUpBeforeClass() {
+	public static function setUpBeforeClass(): void {
 		$class = get_called_class();
 
 		if (isset(Config::$start_timestamp_filename)) {
@@ -181,7 +181,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	 *
 	 * @access public
 	 */
-	public static function tearDownAfterClass() {
+	public static function tearDownAfterClass():void {
 		$class = get_called_class();
 
 		if (isset(Config::$start_timestamp_filename)) {

@@ -40,12 +40,20 @@ class Test_All extends \Skeleton\Console\Command {
 
 		$directory = \Skeleton\Test\Config::$test_directory;
 		$phpunit = new \PHPUnit\TextUI\TestRunner;
-		$printer = new \zf2timo\PrettyResultPrinter\Printer();
 
-		$arguments = [ 'colors' => 'always', 'verbose' => true, 'debug' => true, 'tap' => true, 'loadedExtensions' => [], 'notLoadedExtensions' => []];
+		$arguments = [
+			'colors' => 'always',
+			'verbose' => false,
+			'debug' => false,
+			'loadedExtensions' => [],
+			'notLoadedExtensions' => [],
+			'extensions' => [],
+			'warnings' => [],
+			'stderr' => true,
+		];
 
 		if (!$input->getOption('disable-pretty-printer')) {
-			$arguments['printer'] = new \zf2timo\PrettyResultPrinter\Printer(null, false, true, false, 150);
+			$arguments['printer'] = new \Sempro\PHPUnitPrettyPrinter\PrettyPrinter(null, false, 'always', false, 150);
 		}
 
 

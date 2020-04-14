@@ -56,7 +56,7 @@ abstract class Page {
 	 */
 	public function check_error() {
 		if ($this->has_error($error)) {
-			throw new \Exception('Error on page: ' . $error);
+			throw new \Exception('Error on page: ' . "\n" . $error);
 		}
 	}
 
@@ -68,24 +68,13 @@ abstract class Page {
 	 * @return bool
 	 */
 	public function has_error(&$error = '') {
-
-		$error_messages = [
-			'>FatalError</span>',
-			'>ParseError</span>',
-			'>Warning</span>',
-			'>Notice</span>'
-		];
-
-		foreach ($error_messages as $error_message) {
-			$script = "return document.body.innerHTML.indexOf('" . $error_message . "');";
-			$return = $this->webdriver->executeScript($script, []);
-			if ($return != -1) {
-				$error = $error_message;
-				return true;
-			}
+		$script = "if (document.querySelector('.exc-message') !== null) { return document.querySelector('#plain-exception').innerText } else { return false; }";
+		$return = $this->webdriver->executeScript($script, []);
+		if ($return === false) {
+			return false;
+		} else {
+			$error = $return;
+			return true;
 		}
-
-
-		return false;
 	}
 }

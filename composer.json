@@ -2,10 +2,16 @@
     "name": "tigron/skeleton-test",
     "description": "Testing utilities for Skeleton",
     "type": "library",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/tigron/phpunit-pretty-print.git"
+        }
+    ],
     "require": {
-		"phpunit/phpunit": "^6.5",
+		"phpunit/phpunit": "^9.1.1",
 		"php-webdriver/webdriver": "^1.1",
-		"zf2timo/phpunit-pretty-result-printer": "2.0.0"
+		"tigron/phpunit-pretty-print": "dev-master"
     },
     "suggest": {
 		"tigron/skeleton-file": ">=0.3.0"
