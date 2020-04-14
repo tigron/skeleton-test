@@ -43,11 +43,11 @@ class Test_Intense extends \Skeleton\Console\Command {
 		$directory = \Skeleton\Test\Config::$test_directory;
 		$phpunit = new \PHPUnit\TextUI\TestRunner();
 
-		$arguments = [ 
-			'colors' => 'always', 
-			'verbose' => false, 
-			'debug' => false, 
-			'loadedExtensions' => [], 
+		$arguments = [
+			'colors' => 'always',
+			'verbose' => false,
+			'debug' => false,
+			'loadedExtensions' => [],
 			'notLoadedExtensions' => [],
 			'extensions' => [],
 			'warnings' => [],
@@ -56,7 +56,7 @@ class Test_Intense extends \Skeleton\Console\Command {
 		];
 
 		if (!$input->getOption('disable-pretty-printer')) {
-			$arguments['printer'] = new \Sempro\PHPUnitPrettyPrinter\PrettyPrinter(null, false, 'always', false, 150);
+			$arguments['printer'] = new \Skeleton\Test\Printer(null, false, 'always', false, 150);
 		}
 
 		$suite = new \PHPUnit\Framework\TestSuite();

@@ -53,7 +53,7 @@ class Test_All extends \Skeleton\Console\Command {
 		];
 
 		if (!$input->getOption('disable-pretty-printer')) {
-			$arguments['printer'] = new \Sempro\PHPUnitPrettyPrinter\PrettyPrinter(null, false, 'always', false, 150);
+			$arguments['printer'] = new \Skeleton\Test\Printer(null, false, 'always', false, 150);
 		}
 
 
