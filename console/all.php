@@ -57,7 +57,38 @@ class Test_All extends \Skeleton\Console\Command {
 		}
 
 
-		$test_results = $phpunit->run($phpunit->getTest($directory, '', '.php'), $arguments);
+		$declared_classes = get_declared_classes();
+
+		// Load classes inside the given folder:
+		$dir_iterator = new \RecursiveDirectoryIterator($directory);
+		$iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::SELF_FIRST);
+
+		foreach ($iterator as $file) {
+			$filename = $file->getFilename();
+			if ($filename[0] == '.') {
+				continue;
+			}
+			if (is_dir($file->getPathname())) {
+				continue;
+			}
+		    require_once $file->getPathname();
+		}
+
+		$scenes = array_diff(get_declared_classes(), $declared_classes);
+		
+		foreach ($scenes as $key => $scene) {
+			if (strpos($scene, 'Scene_') !== 0) {
+				unset($scenes[$key]);
+			}
+		}
+		sort($scenes);
+
+		$suite = new \PHPUnit\Framework\TestSuite();
+		foreach ($scenes as $scene) {
+			$suite->addTestSuite($scene);
+		}		
+
+		$test_results = $phpunit->run($suite, $arguments);
 		return 0;
 	}
 
