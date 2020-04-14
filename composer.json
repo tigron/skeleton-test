@@ -11,7 +11,7 @@
     "require": {
 		"phpunit/phpunit": "^9.1.1",
 		"php-webdriver/webdriver": "^1.1",
-		"tigron/phpunit-pretty-print": "dev-master"
+		"tigron/phpunit-pretty-print": "^2.0.0"
     },
     "suggest": {
 		"tigron/skeleton-file": ">=0.3.0"
