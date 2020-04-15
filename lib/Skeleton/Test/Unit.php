@@ -117,7 +117,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 				self::$my_webdriver = $driver;
 				self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
 			} else {
-				throw new Exception("Unknown browser '" . Config::$browser . "'");
+				throw new \Exception("Unknown browser '" . Config::$browser . "'");
 			}
 		}
 		return self::$my_webdriver;
@@ -162,7 +162,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 
 		try {
 			$class::setupBeforeScene();
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 		}
 	}
 
@@ -206,7 +206,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 
 		try {
 			$class::tearDownAfterScene();
-		} catch(Exception $e) {
+		} catch (\Exception $e) {
 		}
 
 		if (self::$my_webdriver !== null) {
