@@ -95,6 +95,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 					'application/x-unknown',
 					'application/pdf',
 					'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+					'application/zip',
 				];
 				$profile = new \Facebook\WebDriver\Firefox\FirefoxProfile();
 				$profile->setPreference('browser.startup.homepage', 'about:blank');
