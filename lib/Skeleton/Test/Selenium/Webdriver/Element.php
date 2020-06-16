@@ -27,7 +27,7 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 * @access public
 	 */
     public function click() {
-    	$this->selenium_webdriver->wait(10, 2000)->until(
+		$this->selenium_webdriver->wait(60, 200)->until(
     		WebDriverExpectedCondition::visibilityOf($this)
     	);
     	if (!$this->isEnabled()) {
@@ -37,7 +37,7 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
         parent::click();
         $webdriver = $this->selenium_webdriver;
 
-        $this->selenium_webdriver->wait()->until(
+        $this->selenium_webdriver->wait(60, 200)->until(
         	function () use ($webdriver) {
 				$state = $webdriver->executeScript("return document.readyState;", [ ]);
 				if ($state == 'complete') {
@@ -58,7 +58,7 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 * @access public
 	 */
     public function click_stale() {
-    	$this->selenium_webdriver->wait(10, 2000)->until(
+		$this->selenium_webdriver->wait(60, 200)->until(
     		WebDriverExpectedCondition::visibilityOf($this)
     	);
     	if (!$this->isEnabled()) {
@@ -68,20 +68,7 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
         parent::click();
         $webdriver = $this->selenium_webdriver;
 
-		$this->selenium_webdriver->wait()->until(WebDriverExpectedCondition::stalenessOf($this));
-        /*
-        $this->selenium_webdriver->wait()->until(
-        	function () use ($webdriver) {
-				$state = $webdriver->executeScript("return document.readyState;", [ ]);
-				if ($state == 'complete') {
-					return true;
-				} else {
-					return false;
-				}
-        	},
-        	'Error: document doesn\'t enter readyState after click'
-        );
-        */
+		$this->selenium_webdriver->wait(60, 200)->until(WebDriverExpectedCondition::stalenessOf($this));
 		$this->selenium_webdriver->page->check_error();
     }    
 
