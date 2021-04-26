@@ -83,16 +83,17 @@ class Unit extends \PHPUnit\Framework\TestCase {
 				self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
 			} else if (Config::$browser == 'firefox') {
 				$mime_types = [
-					'application/download',
-					'application/octet-stream',
 					'application/binary',
 					'application/csv',
-					'application/x-unknown',
-					'application/vnd.ms-excel',
+					'application/download',
+					'application/json',
+					'application/octet-stream',
 					'application/pdf',
+					'application/vnd.ms-excel',
 					'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 					'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 					'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+					'application/x-unknown',
 					'application/zip',
 					'binary/octet-stream',
 					'image/jpg',
@@ -102,6 +103,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 					'text/plain',
 					'text/csv',
 					'text/comma-separated-values',
+					'text/html',
 				];
 				$profile = new \Facebook\WebDriver\Firefox\FirefoxProfile();
 				$profile->setPreference('browser.startup.homepage', 'about:blank');
