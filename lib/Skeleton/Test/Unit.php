@@ -172,7 +172,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 		try {
 			$class::setupBeforeScene();
 		} catch(\Exception $e) {
-			printf("Error in %s::setupBeforeScene(): %s\n", $class, $e->getMessage());
+			printf("Error in %s::setupBeforeScene(): %s\n%s\n", $class, $e->getMessage(), $e->getTraceAsString());
 		}
 	}
 
@@ -217,7 +217,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 		try {
 			$class::tearDownAfterScene();
 		} catch (\Exception $e) {
-			printf("Error in %s::tearDownAfterScene(): %s\n", $class, $e->getMessage());
+			printf("Error in %s::tearDownAfterScene(): %s\n%s\n", $class, $e->getMessage(), $e->getTraceAsString());
 		}
 
 		if (self::$my_webdriver !== null) {
