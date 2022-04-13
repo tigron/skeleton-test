@@ -33,14 +33,16 @@ class Test_All extends \Skeleton\Console\Command {
 	 * @param OutputInterface $output
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		if (!file_exists(\Skeleton\Test\Config::$test_directory)) {
-			$output->writeln('<error>Config::$test_directory is not set to a valid directory</error>');
+		if (\Skeleton\Test\Config::$test_directory !== null) {
+			\Skeleton\Test\Config::$test_path = \Skeleton\Test\Config::$test_directory;
+		}
+
+		if (!file_exists(\Skeleton\Test\Config::$test_path)) {
+			$output->writeln('<error>Config::$test_path is not set to a valid path</error>');
 			return 1;
 		}
 
-		$directory = \Skeleton\Test\Config::$test_directory;
 		$phpunit = new \PHPUnit\TextUI\TestRunner;
-
 		$arguments = [
 			'colors' => 'always',
 			'verbose' => false,
@@ -60,7 +62,7 @@ class Test_All extends \Skeleton\Console\Command {
 		$declared_classes = get_declared_classes();
 
 		// Load classes inside the given folder:
-		$dir_iterator = new \RecursiveDirectoryIterator($directory);
+		$dir_iterator = new \RecursiveDirectoryIterator(\Skeleton\Test\Config::$test_path);
 		$iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::SELF_FIRST);
 
 		foreach ($iterator as $file) {
@@ -75,7 +77,7 @@ class Test_All extends \Skeleton\Console\Command {
 		}
 
 		$scenes = array_diff(get_declared_classes(), $declared_classes);
-		
+
 		foreach ($scenes as $key => $scene) {
 			if (strpos($scene, 'Scene_') !== 0) {
 				unset($scenes[$key]);
@@ -86,7 +88,7 @@ class Test_All extends \Skeleton\Console\Command {
 		$suite = new \PHPUnit\Framework\TestSuite();
 		foreach ($scenes as $scene) {
 			$suite->addTestSuite($scene);
-		}		
+		}
 
 		$test_results = $phpunit->run($suite, $arguments);
 		return 0;

@@ -35,14 +35,16 @@ class Test_Intense extends \Skeleton\Console\Command {
 	 * @param OutputInterface $output
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		if (!file_exists(\Skeleton\Database\Migration\Config::$migration_directory)) {
-			$output->writeln('<error>Config::$test_directory is not set to a valid directory</error>');
+		if (\Skeleton\Test\Config::$test_directory !== null) {
+			\Skeleton\Test\Config::$test_path = \Skeleton\Test\Config::$test_directory;
+		}
+
+		if (!file_exists(\Skeleton\Database\Migration\Config::$test_path)) {
+			$output->writeln('<error>Config::$test_path is not set to a valid directory</error>');
 			return 1;
 		}
 
-		$directory = \Skeleton\Test\Config::$test_directory;
 		$phpunit = new \PHPUnit\TextUI\TestRunner();
-
 		$arguments = [
 			'colors' => 'always',
 			'verbose' => false,

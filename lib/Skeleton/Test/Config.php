@@ -33,9 +33,20 @@ class Config {
 	 * This folder will be used to store the tests
 	 *
 	 * @access public
+	 * @deprecated use $test_path instead
 	 * @var string $test_directory
 	 */
 	public static $test_directory = null;
+
+	/**
+	 * Test path
+	 *
+	 * This folder will be used to store the tests
+	 *
+	 * @access public
+	 * @var string $test_path
+	 */
+	public static $test_path = null;
 
 	/**
 	 * Name of the file where the start timestamp will be stored
