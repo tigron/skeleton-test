@@ -39,7 +39,7 @@ class Test_Intense extends \Skeleton\Console\Command {
 			\Skeleton\Test\Config::$test_path = \Skeleton\Test\Config::$test_directory;
 		}
 
-		if (!file_exists(\Skeleton\Database\Migration\Config::$test_path)) {
+		if (!file_exists(\Skeleton\Test\Config::$test_path)) {
 			$output->writeln('<error>Config::$test_path is not set to a valid directory</error>');
 			return 1;
 		}
