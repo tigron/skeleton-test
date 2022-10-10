@@ -89,7 +89,7 @@ class Test_File extends \Skeleton\Console\Command {
 			$table->setRows($rows);
 			$table->render();
 		} else {
-			$output->writeln('<error>Invalid action [add|list|remove]</error>');
+			$output->writeln('<error>Invalid action [add|list|delete]</error>');
 		}
 		return 0;
 	}
