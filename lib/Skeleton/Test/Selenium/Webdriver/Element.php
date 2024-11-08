@@ -26,51 +26,62 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 *
 	 * @access public
 	 */
-    public function click() {
+	public function click() {
+		$this->selenium_webdriver->executeScript("arguments[0].scrollIntoView(true);", [ $this ]);
 		$this->selenium_webdriver->wait(60, 200)->until(
-    		WebDriverExpectedCondition::visibilityOf($this)
-    	);
-    	if (!$this->isEnabled()) {
-    		throw new \Exception('The element you try to click is not enabled');
-    	}
+			WebDriverExpectedCondition::visibilityOf($this)
+		);
+		if (!$this->isEnabled()) {
+			throw new \Exception('The element you try to click is not enabled');
+		}
 
-        parent::click();
-        $webdriver = $this->selenium_webdriver;
+		for ($i = 0; $i < 10; $i++) {
+			try {
+				parent::click();
+				break;
+			} catch (\Exception $e) {}
+		}
+		$webdriver = $this->selenium_webdriver;
 
-        $this->selenium_webdriver->wait(60, 200)->until(
-        	function () use ($webdriver) {
+		$this->selenium_webdriver->wait(60, 200)->until(
+			function () use ($webdriver) {
 				$state = $webdriver->executeScript("return document.readyState;", [ ]);
 				if ($state == 'complete') {
 					return true;
 				} else {
 					return false;
 				}
-        	},
-        	'Error: document doesn\'t enter readyState after click'
-        );
+			},
+			'Error: document doesn\'t enter readyState after click'
+		);
 
 		$this->selenium_webdriver->page->check_error();
-    }
+	}
 
 	/**
 	 * Click the element
 	 *
 	 * @access public
 	 */
-    public function click_stale() {
+	public function click_stale() {
+		$this->selenium_webdriver->executeScript("arguments[0].scrollIntoView(true);", [ $this ]);
 		$this->selenium_webdriver->wait(60, 200)->until(
-    		WebDriverExpectedCondition::visibilityOf($this)
-    	);
-    	if (!$this->isEnabled()) {
-    		throw new \Exception('The element you try to click is not enabled');
-    	}
+			WebDriverExpectedCondition::visibilityOf($this)
+		);
+		if (!$this->isEnabled()) {
+			throw new \Exception('The element you try to click is not enabled');
+		}
 
-        parent::click();
-        $webdriver = $this->selenium_webdriver;
-
+		for ($i = 0; $i < 10; $i++) {
+			try {
+				parent::click();
+				$webdriver = $this->selenium_webdriver;
+				break;
+			} catch (\Exception $e) {}
+		}
 		$this->selenium_webdriver->wait(60, 200)->until(WebDriverExpectedCondition::stalenessOf($this));
 		$this->selenium_webdriver->page->check_error();
-    }    
+	}
 
 	/**
 	 * Find an element
