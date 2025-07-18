@@ -32,7 +32,7 @@ class Test_All extends \Skeleton\Console\Command {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if (\Skeleton\Test\Config::$test_directory !== null) {
 			\Skeleton\Test\Config::$test_path = \Skeleton\Test\Config::$test_directory;
 		}

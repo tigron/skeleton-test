@@ -39,7 +39,7 @@ class Test_File extends \Skeleton\Console\Command {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$action = $input->getArgument('action');
 		if ($action == 'add') {
 			$identifier = $input->getArgument('identifier');
