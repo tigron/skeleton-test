@@ -154,7 +154,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 				throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
 			}
 			$timestamp = round(time() - intval(file_get_contents(Config::$start_timestamp_filename)));
-			$time = sprintf("%02d:%02d:%02d", ($timestamp/3600), ($timestamp/60%60), $timestamp%60);
+			$time = sprintf("%02d:%02d:%02d", (int)($timestamp/3600), (int)($timestamp/60%60), (int)$timestamp%60);
 			$timings = [];
 			if (file_exists(Config::$timings_filename)) {
 				$timings = json_decode(file_get_contents(Config::$timings_filename), true);
