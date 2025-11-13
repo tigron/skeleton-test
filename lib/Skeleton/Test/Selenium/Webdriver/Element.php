@@ -27,7 +27,7 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 * @access public
 	 */
 	public function click() {
-		$this->selenium_webdriver->executeScript("arguments[0].scrollIntoView(true);", [ $this ]);
+		$this->selenium_webdriver->executeScript("arguments[0].scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });", [ $this ]);
 		$this->selenium_webdriver->wait(60, 200)->until(
 			WebDriverExpectedCondition::visibilityOf($this)
 		);
