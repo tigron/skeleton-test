@@ -34,7 +34,7 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
         $src = parent::findElement($by);
 		$dest = new \Skeleton\Test\Selenium\Webdriver\Element($this->executeMethod, $this->sessionID);
 		$dest->import($src);
-		$dest->selenium_webdriver = $this;
+		$dest->webdriver = $this;
 
 		if ($timeout != null) {
 			$this->manage()->timeouts()->implicitlyWait(Config::$default_implicit_timeout);
@@ -59,7 +59,7 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
         foreach ($sources as $source) {
 			$dest = new \Skeleton\Test\Selenium\Webdriver\Element($this->executeMethod, $this->sessionID);
 			$dest->import($source);
-			$dest->selenium_webdriver = $this;
+			$dest->webdriver = $this;
 			$destinations[] = $dest;
         }
 
