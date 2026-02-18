@@ -28,7 +28,7 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
 	 * @return Skeleton\Test\Selenium\Webdriver\Element $element
 	 */
 	public function findElement(WebDriverBy $by, $timeout = null) {
-		if ($timeout != null) {
+		if ($timeout !== null) {
 			$this->manage()->timeouts()->implicitlyWait($timeout);
 		}
         $src = parent::findElement($by);
@@ -36,7 +36,7 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
 		$dest->import($src);
 		$dest->webdriver = $this;
 
-		if ($timeout != null) {
+		if ($timeout !== null) {
 			$this->manage()->timeouts()->implicitlyWait(Config::$default_implicit_timeout);
 		}
 		return $dest;
@@ -51,7 +51,7 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
 	 * @return array $elements
 	 */
 	public function findElements(WebDriverBy $by, $timeout = null) {
-		if ($timeout != null) {
+		if ($timeout !== null) {
 			$this->manage()->timeouts()->implicitlyWait($timeout);
 		}
         $sources = parent::findElements($by);
@@ -63,7 +63,7 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
 			$destinations[] = $dest;
         }
 
-		if ($timeout != null) {
+		if ($timeout !== null) {
 			$this->manage()->timeouts()->implicitlyWait(Config::$default_implicit_timeout);
 		}
 		return $destinations;
