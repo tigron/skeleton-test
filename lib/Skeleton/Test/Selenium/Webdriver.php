@@ -8,6 +8,7 @@
 namespace Skeleton\Test\Selenium;
 
 use Facebook\WebDriver\WebDriverBy;
+use Skeleton\Test\Config;
 
 class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
 
