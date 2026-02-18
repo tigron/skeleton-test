@@ -8,7 +8,8 @@
  */
 
 namespace Skeleton\Test;
-
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
 
 class Unit extends \PHPUnit\Framework\TestCase {
@@ -33,6 +34,102 @@ class Unit extends \PHPUnit\Framework\TestCase {
 		if ($key === 'webdriver') {
 			return self::get_webdriver();
 		}
+	}
+
+	/**
+	 * Initialize a new webdriver connection if needed
+	 *
+	 * @access public
+	 */
+	public static function get_webdriver() {
+		if (self::$my_webdriver === null) {
+			if (Config::$browser == 'chrome') {
+				$chromeOptions = new \Facebook\WebDriver\Chrome\ChromeOptions();
+				$arguments = [
+	//				'--headless',
+					'--no-sandbox',
+					'--disable-gpu',
+					'--disable-infobars',
+					'--enable-automation',
+					'--suppress-message-center-popups',
+					'--start-maximized',
+					'--test-type',
+				];
+				$chromeOptions->addArguments($arguments);
+				$chromeOptions->setExperimentalOption('excludeSwitches', ['enable-automation']);
+				$chromeOptions->setExperimentalOption('useAutomationExtension', false);
+				$prefs = ["profile.default_content_setting_values.notifications" => 2];
+				$chromeOptions->setExperimentalOption("prefs", $prefs);
+
+				$capabilities = DesiredCapabilities::chrome();
+				$capabilities->setCapability(\Facebook\WebDriver\Chrome\ChromeOptions::CAPABILITY, $chromeOptions);
+
+				// this are the lines of code you need to add
+				$custom_capability = [
+					'args' => $arguments,
+					'excludeSwitches' => [ 'enable-automation' ],
+					'useAutomationExtension' => false,
+				];
+				$capabilities->setCapability('goog:chromeOptions', $custom_capability);
+
+
+				$driver = \Skeleton\Test\Selenium\Webdriver::create(
+					Config::$selenium_hub,
+					$capabilities,
+					60 * 1000, // Connection timeout in miliseconds
+					60 * 1000  // Request timeout in miliseconds
+				);
+				self::$my_webdriver = $driver;
+				self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
+			} else if (Config::$browser == 'firefox') {
+				$mime_types = [
+					'application/binary',
+					'application/csv',
+					'application/download',
+					'application/json',
+					'application/octet-stream',
+					'application/pdf',
+					'application/vnd.ms-excel',
+					'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+					'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+					'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+					'application/x-unknown',
+					'application/zip',
+					'binary/octet-stream',
+					'image/jpg',
+					'image/jpeg',
+					'image/gif',
+					'image/png',
+					'text/plain',
+					'text/csv',
+					'text/comma-separated-values',
+					'text/html',
+				];
+				$profile = new \Facebook\WebDriver\Firefox\FirefoxProfile();
+				$profile->setPreference('browser.startup.homepage', 'about:blank');
+				$profile->setPreference('browser.download.folderList', 0);
+				$profile->setPreference('browser.download.manager.showWhenStarting', false);
+				$profile->setPreference('browser.download.dir', '/tmp');
+				$profile->setPreference('browser.helperApps.alwaysAsk.force', false);
+				$profile->setPreference('browser.download.manager.alertOnEXEOpen', false);
+				$profile->setPreference('browser.download.manager.focusWhenStarting', false);
+				$profile->setPreference('browser.download.manager.useWindow', false);
+				$profile->setPreference('browser.download.manager.showAlertOnComplete', false);
+				$profile->setPreference('browser.download.manager.closeWhenDone', true);
+				$profile->setPreference('browser.download.panel.shown', false);
+				$profile->setPreference('pdfjs.disabled', true);
+				$profile->setPreference('browser.helperApps.neverAsk.openFile', implode($mime_types));
+				$profile->setPreference('browser.helperApps.neverAsk.saveToDisk', implode($mime_types));
+				$capabilities = DesiredCapabilities::firefox();
+				$capabilities->setCapability(\Facebook\WebDriver\Firefox\FirefoxDriver::PROFILE, $profile);
+				$driver = \Skeleton\Test\Selenium\Webdriver::create(Config::$selenium_hub, $capabilities);
+				self::$my_webdriver = $driver;
+				self::$my_webdriver->manage()->timeouts()->implicitlyWait(5);
+			} else {
+				throw new \Exception("Unknown browser '" . Config::$browser . "'");
+			}
+		}
+		return self::$my_webdriver;
 	}
 
 	/**

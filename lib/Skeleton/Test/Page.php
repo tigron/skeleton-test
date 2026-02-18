@@ -15,9 +15,9 @@ abstract class Page {
 	 * Webdriver variable
 	 *
 	 * @access protected
-	 * @var \Skeleton\Selenium\Webdriver $webdriver
+	 * @var \Facebook\Webdriver\Webdriver $webdriver
 	 */
-	private $webdriver = null;
+	protected $webdriver = null;
 
 	/**
 	 * Construct
@@ -25,22 +25,10 @@ abstract class Page {
 	 * @access public
 	 * @param \Facebook\Webdriver\WebDriver
 	 */
-	public function __construct() {
-		$this->get_webdriver()->manage()->window()->maximize();
-	}
-
-	/**
-	 * Get webdriver
-	 *
-	 * @access protected
-	 * @return Skeleton\Test\Selenium\Webdriver $webdriver
-	 */
-	protected function get_webdriver(): \Skeleton\Test\Selenium\Webdriver {
-		if (empty($this->webdriver)) {
-			$this->webdriver = \Skeleton\Test\Selenium\Webdriver::initiate();
-			$this->webdriver->page = $this;
-		}
-		return $this->webdriver;
+	public function __construct(\Facebook\Webdriver\Webdriver $webdriver) {
+		$this->webdriver = $webdriver;
+		$this->webdriver->page = $this;
+		$this->webdriver->manage()->window()->maximize();
 	}
 
 	/**
@@ -57,7 +45,36 @@ abstract class Page {
 	 * @access public
 	 */
 	public function open() {
-		$this->get_webdriver()->get($this->get_url());
+		$this->webdriver->get($this->get_url());
 		$this->check_error();
+	}
+
+	/**
+	 * Check for error and throw exception
+	 *
+	 * @access public
+	 */
+	public function check_error() {
+		if ($this->has_error($error)) {
+			throw new \Exception('Error on page: ' . "\n" . $error);
+		}
+	}
+
+	/**
+	 * Has error
+	 * Checks if the current page contains an error
+	 *
+	 * @access public
+	 * @return bool
+	 */
+	public function has_error(&$error = '') {
+		$script = "if (document.querySelector('.exc-message') !== null) { return document.querySelector('#plain-exception').innerText } else { return false; }";
+		$return = $this->webdriver->executeScript($script, []);
+		if ($return === false) {
+			return false;
+		} else {
+			$error = $return;
+			return true;
+		}
 	}
 }

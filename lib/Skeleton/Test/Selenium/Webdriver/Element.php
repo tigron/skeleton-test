@@ -27,8 +27,43 @@ class Element extends \Facebook\WebDriver\Remote\RemoteWebElement {
 	 * @access public
 	 * @param array $options
 	 */
-	public function click() {
-		parent::click();
+	public function click(array $options = []) {
+		if (isset($options['autoscroll']) === false || $options['autoscroll'] === true) {
+			$this->webdriver->executeScript("arguments[0].scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' }); window.scrollBy(0, -60);", [ $this ]);
+		}
+
+		$this->webdriver->wait(60, 200)->until(
+			WebDriverExpectedCondition::visibilityOf($this)
+		);
+		if (!$this->isEnabled()) {
+			throw new \Exception('The element you try to click is not enabled');
+		}
+
+		for ($i = 0; $i < 10; $i++) {
+			try {
+				parent::click();
+				break;
+			} catch (\Exception $e) {}
+		}
+		$webdriver = $this->webdriver;
+
+		if (empty($options['stale'])) {
+			$this->webdriver->wait(60, 200)->until(
+				function () use ($webdriver) {
+					$state = $webdriver->executeScript("return document.readyState;", [ ]);
+					if ($state == 'complete') {
+						return true;
+					} else {
+						return false;
+					}
+				},
+				'Error: document doesn\'t enter readyState after click'
+			);
+		} else {
+			$this->webdriver->wait(60, 200)->until(WebDriverExpectedCondition::stalenessOf($this));
+		}
+
+		$this->webdriver->page->check_error();
 	}
 
 	/**
