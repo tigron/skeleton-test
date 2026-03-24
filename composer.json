@@ -3,7 +3,7 @@
     "description": "Testing utilities for Skeleton",
     "type": "library",
     "require": {
-		"phpunit/phpunit": "^9.6",
+		"phpunit/phpunit": "~9.6",
 		"php-webdriver/webdriver": "^1.1"
     },
     "suggest": {
