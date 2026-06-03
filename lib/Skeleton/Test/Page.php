@@ -12,26 +12,6 @@ namespace Skeleton\Test;
 abstract class Page {
 
 	/**
-	 * Webdriver variable
-	 *
-	 * @access protected
-	 * @var \Facebook\Webdriver\Webdriver $webdriver
-	 */
-	protected $webdriver = null;
-
-	/**
-	 * Construct
-	 *
-	 * @access public
-	 * @param \Facebook\Webdriver\WebDriver
-	 */
-	public function __construct(\Facebook\Webdriver\Webdriver $webdriver) {
-		$this->webdriver = $webdriver;
-		$this->webdriver->page = $this;
-		$this->webdriver->manage()->window()->maximize();
-	}
-
-	/**
 	 * Get url
 	 *
 	 * @access public
@@ -44,21 +24,14 @@ abstract class Page {
 	 *
 	 * @access public
 	 */
-	public function open() {
-		$this->webdriver->get($this->get_url());
-		$this->check_error();
-	}
+	abstract public function open();
 
 	/**
 	 * Check for error and throw exception
 	 *
 	 * @access public
 	 */
-	public function check_error() {
-		if ($this->has_error($error)) {
-			throw new \Exception('Error on page: ' . "\n" . $error);
-		}
-	}
+	abstract public function check_error();
 
 	/**
 	 * Has error
@@ -67,14 +40,5 @@ abstract class Page {
 	 * @access public
 	 * @return bool
 	 */
-	public function has_error(&$error = '') {
-		$script = "if (document.querySelector('.exc-message') !== null) { return document.querySelector('#plain-exception').innerText } else { return false; }";
-		$return = $this->webdriver->executeScript($script, []);
-		if ($return === false) {
-			return false;
-		} else {
-			$error = $return;
-			return true;
-		}
-	}
+	abstract public function has_error(&$error = '');
 }

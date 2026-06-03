@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
 		"phpunit/phpunit": "~9.6",
-		"php-webdriver/webdriver": "^1.1"
+		"php-webdriver/webdriver": "^1.1",
+		"playwright-php/playwright": "^1.2"
     },
     "suggest": {
 		"tigron/skeleton-file": ">=0.3.0"
