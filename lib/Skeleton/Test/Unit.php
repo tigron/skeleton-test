@@ -8,31 +8,8 @@
  */
 
 namespace Skeleton\Test;
-use Facebook\WebDriver\WebDriverBy;
 
 class Unit extends \PHPUnit\Framework\TestCase {
-
-	/**
-	 * The webdriver variable
-	 *
-	 * @access public
-	 * @var Facebook\WebDriver\Remote\RemoteWebDriver $webdriver
-	 */
-	private static $my_webdriver = null;
-
-	/**
-	 * Catch calls to the "webdriver" property and proxy them to our
-	 * get_webdriver() method.
-	 *
-	 * @access public
-	 * @param string $key
-	 * @return mixed
-	 */
-	public function __get($key) {
-		if ($key === 'webdriver') {
-			return self::get_webdriver();
-		}
-	}
 
 	/**
 	 * setupBeforeScene
@@ -128,9 +105,14 @@ class Unit extends \PHPUnit\Framework\TestCase {
 			printf("Error in %s::tearDownAfterScene(): %s\n%s\n", $class, $e->getMessage(), $e->getTraceAsString());
 		}
 
+\Skeleton\Test\Page\Playwright::close();
+
+		// FIXME: loop over all used page drivers and stop them
+/*
 		if (self::$my_webdriver !== null) {
 			self::$my_webdriver->quit();
 			self::$my_webdriver = null;
 		}
+*/
 	}
 }

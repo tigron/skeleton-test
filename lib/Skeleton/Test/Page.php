@@ -12,38 +12,6 @@ namespace Skeleton\Test;
 abstract class Page {
 
 	/**
-	 * Webdriver variable
-	 *
-	 * @access protected
-	 * @var \Facebook\Webdriver\Webdriver $webdriver
-	 */
-	private $webdriver = null;
-
-	/**
-	 * Construct
-	 *
-	 * @access public
-	 * @param \Facebook\Webdriver\WebDriver
-	 */
-	public function __construct() {
-		$this->get_webdriver()->manage()->window()->maximize();
-	}
-
-	/**
-	 * Get webdriver
-	 *
-	 * @access protected
-	 * @return Skeleton\Test\Selenium\Webdriver $webdriver
-	 */
-	protected function get_webdriver(): \Skeleton\Test\Selenium\Webdriver {
-		if (empty($this->webdriver)) {
-			$this->webdriver = \Skeleton\Test\Selenium\Webdriver::initiate();
-			$this->webdriver->page = $this;
-		}
-		return $this->webdriver;
-	}
-
-	/**
 	 * Get url
 	 *
 	 * @access public
@@ -56,8 +24,21 @@ abstract class Page {
 	 *
 	 * @access public
 	 */
-	public function open() {
-		$this->get_webdriver()->get($this->get_url());
-		$this->check_error();
-	}
+	abstract public function open();
+
+	/**
+	 * Check for error and throw exception
+	 *
+	 * @access public
+	 */
+	abstract public function check_error();
+
+	/**
+	 * Has error
+	 * Checks if the current page contains an error
+	 *
+	 * @access public
+	 * @return bool
+	 */
+	abstract public function has_error(&$error = '');
 }

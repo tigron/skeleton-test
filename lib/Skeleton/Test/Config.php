@@ -28,6 +28,14 @@ class Config {
 	public static $selenium_hub = 'http://localhost:4444/wd/hub';
 
 	/**
+	 * Playwright server URL
+	 *
+	 * @access public
+	 * @var string $playwright_server
+	 */
+	public static $playwright_server = 'ws://127.0.0.1:3000/playwright';
+
+	/**
 	 * Test directory
 	 *
 	 * This folder will be used to store the tests
@@ -83,4 +91,20 @@ class Config {
 	 * @var int $default_intense_count
 	 */
 	public static $intense_count = 10;
+
+	/**
+	 * nodejs binary path for Playwright
+	 *
+	 * @access public
+	 * @var string $node_path
+	 */
+	public static $node_path = null;
+
+	/**
+	 * Playwright trace path
+	 *
+	 * @access public
+	 * @var string $playwright_trace_path
+	 */
+	public static $playwright_trace_path = null;
 }
