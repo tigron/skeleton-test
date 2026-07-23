@@ -54,12 +54,25 @@ abstract class Playwright extends \Skeleton\Test\Page {
 		}
 
 		$this->page = self::$context->newPage();
+
+		if (\Skeleton\Test\Config::$playwright_trace_path !== null) {
+			self::$context->startTracing($this->page, [
+				'screenshots' => true,
+				'snapshots' => true,
+			]);
+		}
 	}
 
 	/**
 	 * Close open handles
 	 */
 	public static function close(): void {
+		if (\Skeleton\Test\Config::$playwright_trace_path !== null) {
+			$trace_file = \Skeleton\Test\Config::$playwright_trace_path . '/' . get_called_class() . '.zip';
+			// TODO keep page somewhere
+			// self::$context->stopTracing(self::$page, $trace_file);
+		}
+
 		if (self::$context !== null) {
 			self::$context->close();
 			self::$context = null;
