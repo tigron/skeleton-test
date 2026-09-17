@@ -59,31 +59,9 @@ class Test_All extends \Skeleton\Console\Command {
 		}
 
 
-		$declared_classes = get_declared_classes();
+		$loaded = \Skeleton\Test\Loader::require_all(\Skeleton\Test\Config::$test_path);
 
-		// Load classes inside the given folder:
-		$dir_iterator = new \RecursiveDirectoryIterator(\Skeleton\Test\Config::$test_path);
-		$iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::SELF_FIRST);
-
-		foreach ($iterator as $file) {
-			$filename = $file->getFilename();
-			if ($filename[0] == '.') {
-				continue;
-			}
-			if (is_dir($file->getPathname())) {
-				continue;
-			}
-		    require_once $file->getPathname();
-		}
-
-		$scenes = array_diff(get_declared_classes(), $declared_classes);
-
-		foreach ($scenes as $key => $scene) {
-			if (strpos($scene, 'Scene_') !== 0) {
-				unset($scenes[$key]);
-			}
-		}
-		sort($scenes);
+		$scenes = \Skeleton\Test\Loader::get_scenes($loaded);
 
 		$suite = new \PHPUnit\Framework\TestSuite();
 		foreach ($scenes as $scene) {

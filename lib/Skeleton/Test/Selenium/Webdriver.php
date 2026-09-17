@@ -81,6 +81,22 @@ class Webdriver extends \Facebook\WebDriver\Remote\RemoteWebDriver {
 	}
 
 	/**
+	 * Quit the webdriver session
+	 *
+	 * Closes the current browser session and resets the singleton.
+	 * Named quit_all to avoid clashing with the instance method
+	 * RemoteWebDriver::quit()
+	 *
+	 * @access public
+	 */
+	public static function quit_all(): void {
+		if (self::$webdriver !== null) {
+			self::$webdriver->quit();
+			self::$webdriver = null;
+		}
+	}
+
+	/**
 	 * Create an instance of webdriver based on Config
 	 *
 	 * @access public

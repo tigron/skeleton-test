@@ -53,7 +53,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 
 		try {
 			$class::setupBeforeScene();
-		} catch(\Exception $e) {
+		} catch (\Exception $e) {
 			printf("Error in %s::setupBeforeScene(): %s\n%s\n", $class, $e->getMessage(), $e->getTraceAsString());
 		}
 	}
@@ -73,7 +73,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	 *
 	 * @access public
 	 */
-	public static function tearDownAfterClass():void {
+	public static function tearDownAfterClass(): void {
 		$class = get_called_class();
 
 		if (isset(Config::$start_timestamp_filename)) {
@@ -105,14 +105,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 			printf("Error in %s::tearDownAfterScene(): %s\n%s\n", $class, $e->getMessage(), $e->getTraceAsString());
 		}
 
-\Skeleton\Test\Page\Playwright::close();
-
-		// FIXME: loop over all used page drivers and stop them
-/*
-		if (self::$my_webdriver !== null) {
-			self::$my_webdriver->quit();
-			self::$my_webdriver = null;
-		}
-*/
+		\Skeleton\Test\Selenium\Webdriver::quit_all();
+		\Skeleton\Test\Page\Playwright::close();
 	}
 }
