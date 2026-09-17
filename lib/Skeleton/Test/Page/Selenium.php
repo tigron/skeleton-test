@@ -29,20 +29,6 @@ abstract class Selenium extends \Skeleton\Test\Page {
 	}
 
 	/**
-	 * Get webdriver
-	 *
-	 * @access protected
-	 * @return Skeleton\Test\Selenium\Webdriver $webdriver
-	 */
-	protected function get_webdriver(): \Skeleton\Test\Selenium\Webdriver {
-		if (empty($this->webdriver)) {
-			$this->webdriver = \Skeleton\Test\Selenium\Webdriver::initiate();
-			$this->webdriver->page = $this;
-		}
-		return $this->webdriver;
-	}
-
-	/**
 	 * Get url
 	 *
 	 * @access public
@@ -84,9 +70,158 @@ abstract class Selenium extends \Skeleton\Test\Page {
 
 		if ($return === false) {
 			return false;
-		} else {
-			$error = $return;
-			return true;
 		}
+
+		$error = $return;
+		return true;
+	}
+
+	/**
+	 * Find an element on the page
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector
+	 * @param int $timeout seconds to wait for the element to be attached, 0 = immediate
+	 * @return \Skeleton\Test\Page\Element
+	 * @throws \Skeleton\Test\Page\Elementnotfound when the element is not present
+	 */
+	public function find_element(string $selector, int $timeout = 0): \Skeleton\Test\Page\Element {
+		try {
+			$element = $this->get_webdriver()->findElement(\Skeleton\Test\Selenium\Selector::to_by($selector), $timeout * 1000);
+		} catch (\Facebook\WebDriver\Exception\NoSuchElementException $e) {
+			throw new \Skeleton\Test\Page\Elementnotfound('Element not found: ' . $selector);
+		}
+
+		return new \Skeleton\Test\Page\Selenium\Element($element);
+	}
+
+	/**
+	 * Find elements on the page
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector
+	 * @param int $timeout seconds to wait for the elements to be attached, 0 = immediate
+	 * @return array
+	 */
+	public function find_elements(string $selector, int $timeout = 0): array {
+		try {
+			$elements = $this->get_webdriver()->findElements(\Skeleton\Test\Selenium\Selector::to_by($selector), $timeout * 1000);
+		} catch (\Facebook\WebDriver\Exception\NoSuchElementException $e) {
+			return [];
+		}
+
+		$result = [];
+		foreach ($elements as $element) {
+			$result[] = new \Skeleton\Test\Page\Selenium\Element($element);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Wait until the element is visible
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector
+	 * @param int $seconds
+	 * @return \Skeleton\Test\Page\Element
+	 * @throws \Skeleton\Test\Page\Elementnotfound when the element is not visible in time
+	 */
+	public function wait_until_visible(string $selector, int $seconds = 10): \Skeleton\Test\Page\Element {
+		try {
+			$this->get_webdriver()->wait($seconds, 100)->until(\Facebook\WebDriver\WebDriverExpectedCondition::visibilityOfElementLocated(\Skeleton\Test\Selenium\Selector::to_by($selector)));
+		} catch (\Facebook\WebDriver\Exception\TimeoutException | \Facebook\WebDriver\Exception\NoSuchElementException $e) {
+			throw new \Skeleton\Test\Page\Elementnotfound('Element not visible: ' . $selector);
+		}
+
+		return $this->find_element($selector);
+	}
+
+	/**
+	 * Wait until the element is clickable
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector
+	 * @param int $seconds
+	 * @return \Skeleton\Test\Page\Element
+	 * @throws \Skeleton\Test\Page\Elementnotfound when the element is not clickable in time
+	 */
+	public function wait_until_clickable(string $selector, int $seconds = 10): \Skeleton\Test\Page\Element {
+		try {
+			$this->get_webdriver()->wait($seconds, 100)->until(\Facebook\WebDriver\WebDriverExpectedCondition::elementToBeClickable(\Skeleton\Test\Selenium\Selector::to_by($selector)));
+		} catch (\Facebook\WebDriver\Exception\TimeoutException | \Facebook\WebDriver\Exception\NoSuchElementException $e) {
+			throw new \Skeleton\Test\Page\Elementnotfound('Element not clickable: ' . $selector);
+		}
+
+		return $this->find_element($selector);
+	}
+
+	/**
+	 * Wait until the element is present in the DOM
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector
+	 * @param int $seconds
+	 * @return \Skeleton\Test\Page\Element
+	 * @throws \Skeleton\Test\Page\Elementnotfound when the element is not present in time
+	 */
+	public function wait_until_present(string $selector, int $seconds = 10): \Skeleton\Test\Page\Element {
+		try {
+			$this->get_webdriver()->wait($seconds, 100)->until(\Facebook\WebDriver\WebDriverExpectedCondition::presenceOfElementLocated(\Skeleton\Test\Selenium\Selector::to_by($selector)));
+		} catch (\Facebook\WebDriver\Exception\TimeoutException | \Facebook\WebDriver\Exception\NoSuchElementException $e) {
+			throw new \Skeleton\Test\Page\Elementnotfound('Element not present: ' . $selector);
+		}
+
+		return $this->find_element($selector);
+	}
+
+	/**
+	 * Wait until the element is hidden or removed from the DOM
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector
+	 * @param int $seconds
+	 * @throws \Skeleton\Test\Page\Elementnotfound when the element is still visible after the timeout
+	 */
+	public function wait_until_hidden(string $selector, int $seconds = 10): void {
+		try {
+			$this->get_webdriver()->wait($seconds, 100)->until(\Facebook\WebDriver\WebDriverExpectedCondition::invisibilityOfElementLocated(\Skeleton\Test\Selenium\Selector::to_by($selector)));
+		} catch (\Facebook\WebDriver\Exception\TimeoutException $e) {
+			throw new \Skeleton\Test\Page\Elementnotfound('Element still visible: ' . $selector);
+		}
+	}
+
+	/**
+	 * Get the URL of the current page
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function get_current_url(): string {
+		return $this->get_webdriver()->getCurrentURL();
+	}
+
+	/**
+	 * Set the implicit timeout for element searches
+	 *
+	 * @access public
+	 * @param int $seconds
+	 */
+	public function set_implicit_timeout(int $seconds): void {
+		$this->get_webdriver()->manage()->timeouts()->implicitlyWait($seconds);
+	}
+
+	/**
+	 * Get webdriver
+	 *
+	 * @access protected
+	 * @return Skeleton\Test\Selenium\Webdriver $webdriver
+	 */
+	protected function get_webdriver(): \Skeleton\Test\Selenium\Webdriver {
+		if (empty($this->webdriver)) {
+			$this->webdriver = \Skeleton\Test\Selenium\Webdriver::initiate();
+			$this->webdriver->page = $this;
+		}
+		return $this->webdriver;
 	}
 }
