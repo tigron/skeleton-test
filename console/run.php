@@ -60,7 +60,7 @@ class Test_Run extends \Skeleton\Console\Command {
 			$arguments['printer'] = new \Skeleton\Test\Printer(null, false, 'always', false, 150);
 		}
 
-		\Skeleton\Test\Loader::require_all(\Skeleton\Test\Config::$test_path);
+		\Skeleton\Test\Loader::register_autoloader(\Skeleton\Test\Config::$test_path);
 
 		$suite = new \PHPUnit\Framework\TestSuite();
 		$names = explode(',', $input->getArgument('name'));

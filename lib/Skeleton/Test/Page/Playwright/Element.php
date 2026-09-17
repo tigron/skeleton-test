@@ -3,6 +3,8 @@
  * Playwright implementation of the engine-agnostic Element interface
  *
  * Wraps Playwright\Locator\Locator
+ *
+ * @author Gerry Demaret <gerry@tigron.be>
  */
 
 namespace Skeleton\Test\Page\Playwright;
@@ -24,10 +26,12 @@ class Element implements \Skeleton\Test\Page\Element {
 	/**
 	 * Click the element
 	 *
+	 * Uses the first match, mirroring the selenium findElement semantics.
+	 *
 	 * @access public
 	 */
 	public function click(): void {
-		$this->locator->click();
+		$this->locator->first()->click();
 	}
 
 	/**
@@ -37,7 +41,7 @@ class Element implements \Skeleton\Test\Page\Element {
 	 * @param string $value
 	 */
 	public function send_keys($value): void {
-		$this->locator->fill($value);
+		$this->locator->first()->fill($value);
 	}
 
 	/**
@@ -47,7 +51,7 @@ class Element implements \Skeleton\Test\Page\Element {
 	 * @return bool
 	 */
 	public function is_displayed(): bool {
-		return $this->locator->isVisible();
+		return $this->locator->first()->isVisible();
 	}
 
 	/**
@@ -57,7 +61,7 @@ class Element implements \Skeleton\Test\Page\Element {
 	 * @return string
 	 */
 	public function get_text(): string {
-		return $this->locator->innerText();
+		return $this->locator->first()->innerText();
 	}
 
 	/**
@@ -68,7 +72,7 @@ class Element implements \Skeleton\Test\Page\Element {
 	 * @return string|null
 	 */
 	public function get_attribute(string $name) {
-		return $this->locator->getAttribute($name);
+		return $this->locator->first()->getAttribute($name);
 	}
 
 	/**
@@ -81,7 +85,7 @@ class Element implements \Skeleton\Test\Page\Element {
 	 * @throws \Skeleton\Test\Page\Elementnotfound when the element is not present
 	 */
 	public function find_element(string $selector, int $timeout = 0): \Skeleton\Test\Page\Element {
-		$element = $this->locator->locator($selector);
+		$element = $this->locator->first()->locator($selector);
 
 		if ($timeout === 0) {
 			if ($element->count() === 0) {
@@ -109,7 +113,7 @@ class Element implements \Skeleton\Test\Page\Element {
 	public function find_elements(string $selector, int $timeout = 0): array {
 		$elements = [];
 
-		foreach ($this->locator->locator($selector)->all() as $locator) {
+		foreach ($this->locator->first()->locator($selector)->all() as $locator) {
 			$elements[] = new self($locator);
 		}
 
