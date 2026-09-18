@@ -17,12 +17,22 @@ class Loader {
 	 * so they can be autoloaded in the correct order (traits and parent
 	 * classes are loaded on first use).
 	 *
+	 * Unported test files awaiting migration live in a "legacy" folder
+	 * inside the test path; they remain loadable but are not discovered
+	 * by get_scenes().
+	 *
 	 * @access public
 	 * @param string $path
 	 */
 	public static function register_autoloader(string $path): void {
 		$autoloader = new \Skeleton\Core\Autoloader();
 		$autoloader->add_include_path($path);
+
+		$legacy_path = $path . '/legacy';
+		if (is_dir($legacy_path)) {
+			$autoloader->add_include_path($legacy_path);
+		}
+
 		$autoloader->register();
 	}
 
@@ -30,7 +40,8 @@ class Loader {
 	 * Get all Scene class names in a directory tree
 	 *
 	 * The files are token-scanned for "class Scene_*" declarations, nothing
-	 * is loaded. The classes are autoloaded when the test suite runs.
+	 * is loaded. The classes are autoloaded when the test suite runs. The
+	 * "legacy" folder is skipped, those scenes await porting.
 	 *
 	 * @access public
 	 * @param string $path
@@ -43,6 +54,11 @@ class Loader {
 		$iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::LEAVES_ONLY);
 
 		foreach ($iterator as $file) {
+			$pathname = $file->getPathname();
+			if (str_starts_with($pathname, $path . '/legacy/')) {
+				continue;
+			}
+
 			$filename = $file->getFilename();
 			if ($filename[0] === '.') {
 				continue;

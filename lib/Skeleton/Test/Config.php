@@ -107,4 +107,12 @@ class Config {
 	 * @var string $playwright_trace_path
 	 */
 	public static $playwright_trace_path = null;
+
+	/**
+	 * Driver used by pages when the scene does not specify one: selenium or playwright
+	 *
+	 * @access public
+	 * @var string $driver
+	 */
+	public static $driver = 'selenium';
 }
