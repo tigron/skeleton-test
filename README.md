@@ -11,7 +11,7 @@ Installation via composer:
 ## Howto
 
 	// Set a path where tests are located in
-	\Skeleton\Test\Config::$test_path = /my_tests';
+	\Skeleton\Test\Config::$test_path = '/my_tests';
 
 	// For Selenium test, set the Selenium hub URL
 	\Skeleton\Test\Config::$selenium_hub = 'http://localhost:4444/wd/hub';

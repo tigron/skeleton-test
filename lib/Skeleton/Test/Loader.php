@@ -25,6 +25,8 @@ class Loader {
 	 * @param string $path
 	 */
 	public static function register_autoloader(string $path): void {
+		$path = rtrim($path, '/');
+
 		$autoloader = new \Skeleton\Core\Autoloader();
 		$autoloader->add_include_path($path);
 
@@ -48,6 +50,8 @@ class Loader {
 	 * @return array scene class names
 	 */
 	public static function get_scenes(string $path): array {
+		$path = rtrim($path, '/');
+
 		$scenes = [];
 
 		$dir_iterator = new \RecursiveDirectoryIterator($path);
@@ -63,7 +67,7 @@ class Loader {
 			if ($filename[0] === '.') {
 				continue;
 			}
-			if (substr($filename, -4) !== '.php') {
+			if (!str_ends_with($filename, '.php')) {
 				continue;
 			}
 

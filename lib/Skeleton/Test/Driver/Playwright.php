@@ -18,19 +18,21 @@ use Playwright\Configuration\PlaywrightConfigBuilder;
 use Playwright\Exception\TimeoutException;
 use Playwright\Locator\Locator;
 use Playwright\Page\Page as PlaywrightPage;
+use Playwright\PlaywrightClient;
 use Playwright\PlaywrightFactory;
 use Skeleton\Test\Config;
+use Skeleton\Test\Driver;
 use Skeleton\Test\Page\Elementnotfound;
 
-class Playwright implements \Skeleton\Test\Driver {
+class Playwright implements Driver {
 
 	/**
 	 * Local playwright instance
 	 *
 	 * @access private
-	 * @var object $playwright
+	 * @var PlaywrightClient|null $playwright
 	 */
-	private static $playwright = null;
+	private static ?PlaywrightClient $playwright = null;
 
 	/**
 	 * Browser
@@ -98,111 +100,6 @@ class Playwright implements \Skeleton\Test\Driver {
 				'page' => $this->page,
 			];
 		}
-	}
-
-	/**
-	 * Write the trace files and tear down the browser
-	 *
-	 * Stops tracing for all traced pages and closes the shared browser.
-	 *
-	 * @access public
-	 */
-	public static function close_all(): void {
-		if (Config::$playwright_trace_path !== null && self::$context !== null) {
-			if (!is_dir(Config::$playwright_trace_path)) {
-				mkdir(Config::$playwright_trace_path, 0777, true);
-			}
-
-			foreach (self::$traced_pages as $traced_page) {
-				$trace_file = Config::$playwright_trace_path . '/' . $traced_page['scene'] . '-' . $traced_page['page_class'] . '-' . self::$trace_counter . '.zip';
-				self::$trace_counter++;
-
-				try {
-					self::$context->stopTracing($traced_page['page'], $trace_file);
-				} catch (\Exception $e) {
-					error_log('Could not write trace ' . $trace_file . ': ' . $e->getMessage());
-				}
-			}
-		}
-
-		self::$traced_pages = [];
-
-		if (self::$context !== null) {
-			self::$context->close();
-			self::$context = null;
-		}
-
-		if (self::$browser !== null) {
-			self::$browser->close();
-			self::$browser = null;
-		}
-
-		if (self::$playwright !== null) {
-			self::$playwright->close();
-			self::$playwright = null;
-		}
-	}
-
-	/**
-	 * Point playwright to the fake node and server
-	 *
-	 * @access private
-	 */
-	private static function initialize(): void {
-		if (Config::$node_path !== null) {
-			putenv('PLAYWRIGHT_NODE_PATH=' . Config::$node_path);
-		}
-
-		$builder = PlaywrightConfigBuilder::create();
-		$config = $builder->build();
-
-		self::$playwright = PlaywrightFactory::create($config);
-
-		$server = Config::$playwright_server;
-
-		if (in_array(Config::$browser, ['chrome', 'chromium'])) {
-			self::$browser = self::$playwright->chromium()->connect($server);
-		} else if (Config::$browser === 'firefox') {
-			self::$browser = self::$playwright->firefox()->connect($server);
-		} else {
-			throw new \Exception("Unknown browser '" . Config::$browser . "'");
-		}
-
-		$contextOptions = [
-			'ignoreHTTPSErrors' => true,
-		];
-
-		self::$context = self::$browser->newContext($contextOptions);
-	}
-
-	/**
-	 * Locate a selector, optionally scoped to a parent element
-	 *
-	 * @access private
-	 * @param string $selector css or xpath selector
-	 * @param string|null $within selector of a parent element to search in
-	 * @return Locator
-	 */
-	private function locate(string $selector, ?string $within = null): Locator {
-		$locator = $this->page->locator($within ?? $selector);
-
-		if ($within !== null) {
-			$locator = $locator->first()->locator($selector);
-		}
-
-		return $locator;
-	}
-
-	/**
-	 * Locate the first match of a selector
-	 *
-	 * @access private
-	 * @param string $selector css or xpath selector
-	 * @param string|null $within selector of a parent element to search in
-	 * @return Locator
-	 */
-	private function first(string $selector, ?string $within = null): Locator {
-		return $this->locate($selector, $within)->first();
 	}
 
 	/**
@@ -415,7 +312,7 @@ class Playwright implements \Skeleton\Test\Driver {
 				}
 			");
 
-			if ($error_text === false || $error_text === null || $error_text === '') {
+			if (!is_string($error_text) || $error_text === '') {
 				return false;
 			}
 
@@ -425,37 +322,6 @@ class Playwright implements \Skeleton\Test\Driver {
 		} catch (\Exception $e) {
 			return false;
 		}
-	}
-
-	/**
-	 * Wait until a condition is met
-	 *
-	 * The predicate is called every 100ms until it returns true or the
-	 * timeout is reached. Elementnotfound thrown by the predicate is
-	 * treated as false.
-	 *
-	 * @access private
-	 * @param callable $predicate
-	 * @param int $seconds
-	 * @param string $message exception message on timeout
-	 * @throws Elementnotfound when the condition is not met in time
-	 */
-	private function poll(callable $predicate, int $seconds, string $message): void {
-		$deadline = microtime(true) + $seconds;
-
-		while (microtime(true) < $deadline) {
-			try {
-				if ($predicate() === true) {
-					return;
-				}
-			} catch (Elementnotfound $e) {
-				// element not attached yet, retry
-			}
-
-			usleep(100000);
-		}
-
-		throw new Elementnotfound($message);
 	}
 
 	/**
@@ -547,10 +413,167 @@ class Playwright implements \Skeleton\Test\Driver {
 	/**
 	 * Get the native driver object
 	 *
+	 * Escape hatch for driver-specific operations. The returned object is
+	 * the Playwright page.
+	 *
 	 * @access public
 	 * @return PlaywrightPage
 	 */
-	public function native(): mixed {
+	public function native(): PlaywrightPage {
 		return $this->page;
+	}
+
+	/**
+	 * Locate a selector, optionally scoped to a parent element
+	 *
+	 * @access private
+	 * @param string $selector css or xpath selector
+	 * @param string|null $within selector of a parent element to search in
+	 * @return Locator
+	 */
+	private function locate(string $selector, ?string $within = null): Locator {
+		$locator = $this->page->locator($this->to_playwright_selector($within ?? $selector));
+
+		if ($within !== null) {
+			$locator = $locator->first()->locator($this->to_playwright_selector($selector));
+		}
+
+		return $locator;
+	}
+
+	/**
+	 * Locate the first match of a selector
+	 *
+	 * @access private
+	 * @param string $selector css or xpath selector
+	 * @param string|null $within selector of a parent element to search in
+	 * @return Locator
+	 */
+	private function first(string $selector, ?string $within = null): Locator {
+		return $this->locate($selector, $within)->first();
+	}
+
+	/**
+	 * Wait until a condition is met
+	 *
+	 * The predicate is called every 100ms until it returns true or the
+	 * timeout is reached. Elementnotfound thrown by the predicate is
+	 * treated as false.
+	 *
+	 * @access private
+	 * @param callable $predicate
+	 * @param int $seconds
+	 * @param string $message exception message on timeout
+	 * @throws Elementnotfound when the condition is not met in time
+	 */
+	private function poll(callable $predicate, int $seconds, string $message): void {
+		$deadline = microtime(true) + $seconds;
+
+		while (microtime(true) < $deadline) {
+			try {
+				if ($predicate() === true) {
+					return;
+				}
+			} catch (Elementnotfound $e) {
+				// element not attached yet, retry
+			}
+
+			usleep(100000);
+		}
+
+		throw new Elementnotfound($message);
+	}
+
+	/**
+	 * Map an engine-agnostic selector to a playwright selector
+	 *
+	 * Selectors starting with '/' or '(' are xpath, playwright only
+	 * detects xpath automatically for selectors starting with '//', so the
+	 * xpath engine is forced explicitly.
+	 *
+	 * @access private
+	 * @param string $selector
+	 * @return string
+	 */
+	private function to_playwright_selector(string $selector): string {
+		if (str_starts_with($selector, '/') || str_starts_with($selector, '(')) {
+			return 'xpath=' . $selector;
+		}
+
+		return $selector;
+	}
+
+	/**
+	 * Write the trace files and tear down the browser
+	 *
+	 * Stops tracing for all traced pages and closes the shared browser.
+	 *
+	 * @access public
+	 */
+	public static function close_all(): void {
+		if (Config::$playwright_trace_path !== null && self::$context !== null) {
+			if (!is_dir(Config::$playwright_trace_path)) {
+				mkdir(Config::$playwright_trace_path, 0755, true);
+			}
+
+			foreach (self::$traced_pages as $traced_page) {
+				$trace_file = Config::$playwright_trace_path . '/' . $traced_page['scene'] . '-' . $traced_page['page_class'] . '-' . self::$trace_counter . '.zip';
+				self::$trace_counter++;
+
+				try {
+					self::$context->stopTracing($traced_page['page'], $trace_file);
+				} catch (\Exception $e) {
+					error_log('Could not write trace ' . $trace_file . ': ' . $e->getMessage());
+				}
+			}
+		}
+
+		self::$traced_pages = [];
+
+		if (self::$context !== null) {
+			self::$context->close();
+			self::$context = null;
+		}
+
+		if (self::$browser !== null) {
+			self::$browser->close();
+			self::$browser = null;
+		}
+
+		if (self::$playwright !== null) {
+			self::$playwright->close();
+			self::$playwright = null;
+		}
+	}
+
+	/**
+	 * Point playwright to the fake node and server
+	 *
+	 * @access private
+	 */
+	private static function initialize(): void {
+		if (Config::$node_path !== null) {
+			putenv('PLAYWRIGHT_NODE_PATH=' . Config::$node_path);
+		}
+
+		$config = PlaywrightConfigBuilder::create()->build();
+
+		self::$playwright = PlaywrightFactory::create($config);
+
+		$server = Config::$playwright_server;
+
+		if (in_array(Config::$browser, [ 'chrome', 'chromium' ])) {
+			self::$browser = self::$playwright->chromium()->connect($server);
+		} elseif (Config::$browser === 'firefox') {
+			self::$browser = self::$playwright->firefox()->connect($server);
+		} else {
+			throw new \Exception('Unknown browser \'' . Config::$browser . '\'');
+		}
+
+		$context_options = [
+			'ignoreHTTPSErrors' => true,
+		];
+
+		self::$context = self::$browser->newContext($context_options);
 	}
 }

@@ -3,14 +3,19 @@
     "description": "Testing utilities for Skeleton",
     "type": "library",
     "require": {
+        "php": "^8.2",
         "phpunit/phpunit": "~9.6",
         "php-webdriver/webdriver": "^1.1",
         "playwright-php/playwright": "^1.2"
     },
     "suggest": {
-        "tigron/skeleton-file": ">=0.3.0"
+        "tigron/skeleton-console": "Required to register the console commands",
+        "tigron/skeleton-core": "Required for the test autoloader",
+        "tigron/skeleton-database": "Required to store test data files",
+        "tigron/skeleton-file": ">=0.3.0",
+        "tigron/skeleton-object": "Required for the test data files"
     },
-   "license": "MIT",
+    "license": "MIT",
     "authors": [
         {
             "name": "Tigron BVBA",

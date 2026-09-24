@@ -20,10 +20,10 @@ class Config {
 	public static $browser = 'firefox';
 
 	/**
-	 * Browsers
+	 * Selenium hub URL
 	 *
 	 * @access public
-	 * @var array $browsers
+	 * @var string $selenium_hub
 	 */
 	public static $selenium_hub = 'http://localhost:4444/wd/hub';
 
@@ -79,6 +79,8 @@ class Config {
 	/**
 	 * Default implicit timeout when waiting for an object in the dom
 	 *
+	 * The timeout is expressed in seconds.
+	 *
 	 * @access public
 	 * @var int $default_implicit_timeout
 	 */
@@ -88,7 +90,7 @@ class Config {
 	 * Intense test count
 	 *
 	 * @access public
-	 * @var int $default_intense_count
+	 * @var int $intense_count
 	 */
 	public static $intense_count = 10;
 

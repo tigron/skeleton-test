@@ -14,6 +14,9 @@
 
 namespace Skeleton\Test;
 
+use Skeleton\Test\Driver\Playwright;
+use Skeleton\Test\Driver\Selenium;
+
 abstract class Page {
 
 	/**
@@ -59,47 +62,11 @@ abstract class Page {
 			throw new \Exception('Scene ' . self::$current_scene . ' mixes drivers: scene runs on ' . self::$scene_driver . ', page requested ' . $driver_name);
 		}
 
-		$this->driver = match($driver_name) {
-			'selenium' => new \Skeleton\Test\Driver\Selenium(),
-			'playwright' => new \Skeleton\Test\Driver\Playwright(get_class($this), self::$current_scene ?? $driver_name),
+		$this->driver = match ($driver_name) {
+			'selenium' => new Selenium(),
+			'playwright' => new Playwright(get_class($this), self::$current_scene ?? $driver_name),
 			default => throw new \Exception('Unknown driver: ' . $driver_name),
 		};
-	}
-
-	/**
-	 * Announce the scene that is about to run, and its driver
-	 *
-	 * Called by Unit::setUpBeforeClass().
-	 *
-	 * @access public
-	 * @param string $scene scene class
-	 * @param string|null $driver_name driver declared by the scene, null falls back to Config::$driver
-	 */
-	public static function begin_scene(string $scene, ?string $driver_name): void {
-		self::$current_scene = $scene;
-		self::$scene_driver = $driver_name ?? Config::$driver;
-	}
-
-	/**
-	 * End the current scene
-	 *
-	 * Called by Unit::tearDownAfterClass().
-	 *
-	 * @access public
-	 */
-	public static function end_scene(): void {
-		self::$current_scene = null;
-		self::$scene_driver = null;
-	}
-
-	/**
-	 * Get the driver name of the current scene
-	 *
-	 * @access public
-	 * @return string|null
-	 */
-	public static function get_scene_driver(): ?string {
-		return self::$scene_driver;
 	}
 
 	/**
@@ -127,7 +94,7 @@ abstract class Page {
 	 *
 	 * @access public
 	 */
-	public function open() {
+	public function open(): void {
 		$this->driver->open_url($this->get_url());
 		$this->check_error();
 	}
@@ -137,7 +104,8 @@ abstract class Page {
 	 *
 	 * @access public
 	 */
-	public function check_error() {
+	public function check_error(): void {
+		$error = '';
 		if ($this->has_error($error)) {
 			throw new \Exception('Error on page: ' . "\n" . $error);
 		}
@@ -425,5 +393,41 @@ abstract class Page {
 	 */
 	public function set_implicit_timeout(int $seconds): void {
 		$this->driver->set_implicit_timeout($seconds);
+	}
+
+	/**
+	 * Announce the scene that is about to run, and its driver
+	 *
+	 * Called by Unit::setUpBeforeClass().
+	 *
+	 * @access public
+	 * @param string $scene scene class
+	 * @param string|null $driver_name driver declared by the scene, null falls back to Config::$driver
+	 */
+	public static function begin_scene(string $scene, ?string $driver_name): void {
+		self::$current_scene = $scene;
+		self::$scene_driver = $driver_name ?? Config::$driver;
+	}
+
+	/**
+	 * End the current scene
+	 *
+	 * Called by Unit::tearDownAfterClass().
+	 *
+	 * @access public
+	 */
+	public static function end_scene(): void {
+		self::$current_scene = null;
+		self::$scene_driver = null;
+	}
+
+	/**
+	 * Get the driver name of the current scene
+	 *
+	 * @access public
+	 * @return string|null
+	 */
+	public static function get_scene_driver(): ?string {
+		return self::$scene_driver;
 	}
 }

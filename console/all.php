@@ -1,6 +1,6 @@
 <?php
 /**
- * migration:run command for Skeleton Console
+ * test:all command for Skeleton Console
  *
  * @author David Vandemaele <david@tigron.be>
  */
@@ -42,7 +42,7 @@ class Test_All extends \Skeleton\Console\Command {
 			return 1;
 		}
 
-		$phpunit = new \PHPUnit\TextUI\TestRunner;
+		$phpunit = new \PHPUnit\TextUI\TestRunner();
 		$arguments = [
 			'colors' => 'always',
 			'verbose' => false,
@@ -58,7 +58,6 @@ class Test_All extends \Skeleton\Console\Command {
 			$arguments['printer'] = new \Skeleton\Test\Printer(null, false, 'always', false, 150);
 		}
 
-
 		\Skeleton\Test\Loader::register_autoloader(\Skeleton\Test\Config::$test_path);
 
 		$scenes = \Skeleton\Test\Loader::get_scenes(\Skeleton\Test\Config::$test_path);
@@ -69,7 +68,6 @@ class Test_All extends \Skeleton\Console\Command {
 		}
 
 		$test_results = $phpunit->run($suite, $arguments);
-		return 0;
+		return $test_results->wasSuccessful() ? 0 : 1;
 	}
-
 }

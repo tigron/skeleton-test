@@ -12,11 +12,13 @@ namespace Skeleton\Test\Driver;
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Skeleton\Test\Config;
+use Skeleton\Test\Driver;
 use Skeleton\Test\Page\Elementnotfound;
 use Skeleton\Test\Selenium\Selector;
 use Skeleton\Test\Selenium\Webdriver;
+use Skeleton\Test\Selenium\Webdriver\Element;
 
-class Selenium implements \Skeleton\Test\Driver {
+class Selenium implements Driver {
 
 	/**
 	 * Webdriver session
@@ -33,40 +35,6 @@ class Selenium implements \Skeleton\Test\Driver {
 	 */
 	public function __construct() {
 		$this->webdriver = Webdriver::initiate();
-	}
-
-	/**
-	 * Quit all webdriver sessions
-	 *
-	 * @access public
-	 */
-	public static function quit_all(): void {
-		Webdriver::quit_all();
-	}
-
-	/**
-	 * Find an element, optionally scoped to a parent element
-	 *
-	 * The $timeout is used as implicit wait for the lookup. When null, the
-	 * session default implicit wait applies.
-	 *
-	 * @access private
-	 * @param string $selector css or xpath selector
-	 * @param string|null $within selector of a parent element to search in
-	 * @param int|null $timeout implicit wait in milliseconds
-	 * @return \Skeleton\Test\Selenium\Webdriver\Element
-	 * @throws Elementnotfound when the element is not present
-	 */
-	private function find_element(string $selector, ?string $within = null, ?int $timeout = null): \Skeleton\Test\Selenium\Webdriver\Element {
-		if ($within !== null) {
-			return $this->webdriver->findElement(Selector::to_by($within))->findElement(Selector::to_by($selector));
-		}
-
-		try {
-			return $this->webdriver->findElement(Selector::to_by($selector), $timeout);
-		} catch (NoSuchElementException $e) {
-			throw new Elementnotfound('Element not found: ' . $selector);
-		}
 	}
 
 	/**
@@ -116,7 +84,7 @@ class Selenium implements \Skeleton\Test\Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function click(string $selector, ?string $within = null): void {
-		$this->find_element($selector, $within, Config::$default_implicit_timeout * 1000)->click();
+		$this->find_element($selector, $within, Config::$default_implicit_timeout)->click();
 	}
 
 	/**
@@ -128,7 +96,7 @@ class Selenium implements \Skeleton\Test\Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function fill(string $selector, string $value, ?string $within = null): void {
-		$element = $this->find_element($selector, $within, Config::$default_implicit_timeout * 1000);
+		$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
 		$element->clear();
 		$element->sendKeys($value);
 	}
@@ -142,7 +110,7 @@ class Selenium implements \Skeleton\Test\Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function send_keys(string $selector, string $keys, ?string $within = null): void {
-		$this->find_element($selector, $within, Config::$default_implicit_timeout * 1000)->sendKeys($keys);
+		$this->find_element($selector, $within, Config::$default_implicit_timeout)->sendKeys($keys);
 	}
 
 	/**
@@ -153,7 +121,7 @@ class Selenium implements \Skeleton\Test\Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function clear(string $selector, ?string $within = null): void {
-		$this->find_element($selector, $within, Config::$default_implicit_timeout * 1000)->clear();
+		$this->find_element($selector, $within, Config::$default_implicit_timeout)->clear();
 	}
 
 	/**
@@ -165,7 +133,7 @@ class Selenium implements \Skeleton\Test\Driver {
 	 * @return string
 	 */
 	public function get_text(string $selector, ?string $within = null): string {
-		return $this->find_element($selector, $within, Config::$default_implicit_timeout * 1000)->getText();
+		return $this->find_element($selector, $within, Config::$default_implicit_timeout)->getText();
 	}
 
 	/**
@@ -178,7 +146,7 @@ class Selenium implements \Skeleton\Test\Driver {
 	 * @return string|null
 	 */
 	public function get_attribute(string $selector, string $attribute, ?string $within = null): ?string {
-		return $this->find_element($selector, $within, Config::$default_implicit_timeout * 1000)->getAttribute($attribute);
+		return $this->find_element($selector, $within, Config::$default_implicit_timeout)->getAttribute($attribute);
 	}
 
 	/**
@@ -253,7 +221,7 @@ class Selenium implements \Skeleton\Test\Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function hover(string $selector, ?string $within = null): void {
-		$element = $this->find_element($selector, $within, Config::$default_implicit_timeout * 1000);
+		$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
 		$this->webdriver->action()->moveToElement($element)->perform();
 	}
 
@@ -281,43 +249,12 @@ class Selenium implements \Skeleton\Test\Driver {
 		$script = "if (document.querySelector('.exc-message') !== null) { return document.querySelector('#plain-exception').innerText } else { return false; }";
 		$return = $this->webdriver->executeScript($script, []);
 
-		if ($return === false) {
+		if (!is_string($return) || $return === '') {
 			return false;
 		}
 
 		$error = $return;
 		return true;
-	}
-
-	/**
-	 * Wait until a condition is met
-	 *
-	 * The predicate is called every 100ms until it returns true or the
-	 * timeout is reached. Elementnotfound thrown by the predicate is
-	 * treated as false.
-	 *
-	 * @access private
-	 * @param callable $predicate
-	 * @param int $seconds
-	 * @param string $message exception message on timeout
-	 * @throws Elementnotfound when the condition is not met in time
-	 */
-	private function poll(callable $predicate, int $seconds, string $message): void {
-		$deadline = microtime(true) + $seconds;
-
-		while (microtime(true) < $deadline) {
-			try {
-				if ($predicate() === true) {
-					return;
-				}
-			} catch (Elementnotfound $e) {
-				// element not attached yet, retry
-			}
-
-			usleep(100000);
-		}
-
-		throw new Elementnotfound($message);
 	}
 
 	/**
@@ -401,10 +338,83 @@ class Selenium implements \Skeleton\Test\Driver {
 	/**
 	 * Get the native driver object
 	 *
+	 * Escape hatch for driver-specific operations. The returned object is
+	 * the RemoteWebDriver session.
+	 *
 	 * @access public
 	 * @return Webdriver
 	 */
-	public function native(): mixed {
+	public function native(): Webdriver {
 		return $this->webdriver;
+	}
+
+	/**
+	 * Find an element, optionally scoped to a parent element
+	 *
+	 * The $timeout is used as implicit wait for the lookup. When null, the
+	 * session default implicit wait applies.
+	 *
+	 * @access private
+	 * @param string $selector css or xpath selector
+	 * @param string|null $within selector of a parent element to search in
+	 * @param int|null $timeout implicit wait in seconds
+	 * @return Element
+	 * @throws Elementnotfound when the element is not present
+	 */
+	private function find_element(string $selector, ?string $within = null, ?int $timeout = null): Element {
+		if ($within !== null) {
+			try {
+				$parent = $this->webdriver->findElement(Selector::to_by($within), $timeout);
+				return $parent->findElement(Selector::to_by($selector), $timeout);
+			} catch (NoSuchElementException $e) {
+				throw new Elementnotfound('Element not found: ' . $selector . ' within ' . $within);
+			}
+		}
+
+		try {
+			return $this->webdriver->findElement(Selector::to_by($selector), $timeout);
+		} catch (NoSuchElementException $e) {
+			throw new Elementnotfound('Element not found: ' . $selector);
+		}
+	}
+
+	/**
+	 * Wait until a condition is met
+	 *
+	 * The predicate is called every 100ms until it returns true or the
+	 * timeout is reached. Elementnotfound thrown by the predicate is
+	 * treated as false.
+	 *
+	 * @access private
+	 * @param callable $predicate
+	 * @param int $seconds
+	 * @param string $message exception message on timeout
+	 * @throws Elementnotfound when the condition is not met in time
+	 */
+	private function poll(callable $predicate, int $seconds, string $message): void {
+		$deadline = microtime(true) + $seconds;
+
+		while (microtime(true) < $deadline) {
+			try {
+				if ($predicate() === true) {
+					return;
+				}
+			} catch (Elementnotfound $e) {
+				// element not attached yet, retry
+			}
+
+			usleep(100000);
+		}
+
+		throw new Elementnotfound($message);
+	}
+
+	/**
+	 * Quit all webdriver sessions
+	 *
+	 * @access public
+	 */
+	public static function quit_all(): void {
+		Webdriver::quit_all();
 	}
 }

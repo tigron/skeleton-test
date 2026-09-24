@@ -7,11 +7,11 @@
 
 namespace Skeleton\Console\Command;
 
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
 
 class Test_File extends \Skeleton\Console\Command {
 
@@ -22,7 +22,7 @@ class Test_File extends \Skeleton\Console\Command {
 	 */
 	protected function configure() {
 		$this->setName('test:file');
-		if (class_exists("\Skeleton\File\File")) {
+		if (class_exists('\Skeleton\File\File')) {
 			$this->setDescription('Insert/remove/list test data files');
 			$this->addArgument('action', InputArgument::REQUIRED, 'Action');
 			$this->addArgument('identifier', InputArgument::OPTIONAL, 'Identifier of the data test file');
@@ -40,45 +40,50 @@ class Test_File extends \Skeleton\Console\Command {
 	 * @param OutputInterface $output
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
+		if (!class_exists('\Skeleton\File\File')) {
+			$output->writeln('<error>Not available, install skeleton-file first (`composer require tigron/skeleton-file`)</error>');
+			return 1;
+		}
+
 		$action = $input->getArgument('action');
-		if ($action == 'add') {
+		if ($action === 'add') {
 			$identifier = $input->getArgument('identifier');
-			if ($identifier == null || $identifier == '') {
+			if ($identifier === null || $identifier === '') {
 				$output->writeln('<error>Identifier parameter not provided</error>');
 				return 1;
 			}
 			$path = $input->getArgument('path');
-			if ($path == null || $path == '') {
+			if ($path === null || $path === '') {
 				$output->writeln('<error>Path parameter not provided</error>');
 				return 1;
 			}
-			$test_data_file = \Skeleton\Test\Test\Data\File::add_by_path($identifier, $path);
-		} else if ($action == 'delete') {
+			\Skeleton\Test\Test\Data\File::add_by_path($identifier, $path);
+		} elseif ($action === 'delete') {
 			$identifier = $input->getArgument('identifier');
-			if ($identifier == null || $identifier == '') {
+			if ($identifier === null || $identifier === '') {
 				$output->writeln('<error>Identifier parameter not provided</error>');
 				return 1;
 			}
 			$test_data_file = \Skeleton\Test\Test\Data\File::get_by_identifier($identifier);
 			$test_data_file->delete();
-		} else if ($action == 'get') {
+		} elseif ($action === 'get') {
 			$identifier = $input->getArgument('identifier');
-			if ($identifier == null || $identifier == '') {
+			if ($identifier === null || $identifier === '') {
 				$output->writeln('<error>Identifier parameter not provided</error>');
 				return 1;
 			}
 			$path = $input->getArgument('path');
-			if ($path == null || $path == '') {
+			if ($path === null || $path === '') {
 				$output->writeln('<error>Path parameter not provided</error>');
 				return 1;
 			}
 			$test_data_file = \Skeleton\Test\Test\Data\File::get_by_identifier($identifier);
 			file_put_contents($path, $test_data_file->file->get_contents());
-		} else if ($action == 'list') {
+		} elseif ($action === 'list') {
 			$test_data_files = \Skeleton\Test\Test\Data\File::get_all('identifier');
 
 			$table = new Table($output);
-			$table->setHeaders(['ID', 'Identifier', 'Name', 'Size']);
+			$table->setHeaders([ 'ID', 'Identifier', 'Name', 'Size' ]);
 			$rows = [];
 
 			foreach ($test_data_files as $test_data_file) {
@@ -89,7 +94,8 @@ class Test_File extends \Skeleton\Console\Command {
 			$table->setRows($rows);
 			$table->render();
 		} else {
-			$output->writeln('<error>Invalid action [add|list|delete]</error>');
+			$output->writeln('<error>Invalid action [add|get|list|delete]</error>');
+			return 1;
 		}
 		return 0;
 	}
