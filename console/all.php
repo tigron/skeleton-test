@@ -59,9 +59,9 @@ class Test_All extends \Skeleton\Console\Command {
 		}
 
 
-		$loaded = \Skeleton\Test\Loader::require_all(\Skeleton\Test\Config::$test_path);
+		\Skeleton\Test\Loader::register_autoloader(\Skeleton\Test\Config::$test_path);
 
-		$scenes = \Skeleton\Test\Loader::get_scenes($loaded);
+		$scenes = \Skeleton\Test\Loader::get_scenes(\Skeleton\Test\Config::$test_path);
 
 		$suite = new \PHPUnit\Framework\TestSuite();
 		foreach ($scenes as $scene) {
