@@ -123,7 +123,14 @@ class Unit extends \PHPUnit\Framework\TestCase {
 		}
 
 		if (!file_exists(Config::$start_timestamp_filename)) {
-			throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
+			if ($event !== 'start') {
+				throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
+			}
+
+			// The first scene of the run writes the start timestamp itself: it
+			// marks the beginning of the timeline that the selenium video
+			// recording is aligned to
+			file_put_contents(Config::$start_timestamp_filename, strval(time()));
 		}
 
 		$class = get_called_class();
