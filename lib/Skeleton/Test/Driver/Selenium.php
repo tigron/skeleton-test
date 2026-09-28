@@ -12,6 +12,7 @@ namespace Skeleton\Test\Driver;
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
+use Facebook\WebDriver\WebDriverSelect;
 use Skeleton\Test\Config;
 use Skeleton\Test\Driver;
 use Skeleton\Test\Page\Elementnotfound;
@@ -214,6 +215,36 @@ class Selenium implements Driver {
 		} catch (StaleElementReferenceException $e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Select an option of a native select by value
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param string $value
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_value(string $selector, string $value, ?string $within = null): void {
+		$this->element_action(function () use ($selector, $value, $within) {
+			$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
+			(new WebDriverSelect($element))->selectByValue($value);
+		}, $selector, $within);
+	}
+
+	/**
+	 * Select an option of a native select by index (0-based)
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param int $index
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_index(string $selector, int $index, ?string $within = null): void {
+		$this->element_action(function () use ($selector, $index, $within) {
+			$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
+			(new WebDriverSelect($element))->selectByIndex($index);
+		}, $selector, $within);
 	}
 
 	/**

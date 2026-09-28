@@ -396,6 +396,30 @@ abstract class Page {
 	}
 
 	/**
+	 * Select an option of a native select by value
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param string $value
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_value(string $selector, string $value, ?string $within = null): void {
+		$this->driver->select_option_by_value($selector, $value, $within);
+	}
+
+	/**
+	 * Select an option of a native select by index (0-based)
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param int $index
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_index(string $selector, int $index, ?string $within = null): void {
+		$this->driver->select_option_by_index($selector, $index, $within);
+	}
+
+	/**
 	 * Announce the scene that is about to run, and its driver
 	 *
 	 * Called by Unit::setUpBeforeClass().

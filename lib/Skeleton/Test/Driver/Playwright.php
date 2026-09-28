@@ -67,6 +67,14 @@ class Playwright implements Driver {
 	private static int $trace_counter = 0;
 
 	/**
+	 * Shared playwright page (one per scene)
+	 *
+	 * @access private
+	 * @var PlaywrightPage|null $shared_page
+	 */
+	private static ?PlaywrightPage $shared_page = null;
+
+	/**
 	 * Playwright page
 	 *
 	 * @access private
@@ -86,20 +94,23 @@ class Playwright implements Driver {
 			self::initialize();
 		}
 
-		$this->page = self::$context->newPage();
+		if (self::$shared_page === null) {
+			self::$shared_page = self::$context->newPage();
 
-		if (Config::$playwright_trace_path !== null) {
-			self::$context->startTracing($this->page, [
-				'screenshots' => true,
-				'snapshots' => true,
-			]);
+			if (Config::$playwright_trace_path !== null) {
+				self::$context->startTracing(self::$shared_page, [
+					'screenshots' => true,
+					'snapshots' => true,
+				]);
 
-			self::$traced_pages[] = [
-				'scene' => $scene,
-				'page_class' => $page_class,
-				'page' => $this->page,
-			];
+				self::$traced_pages[] = [
+					'scene' => $scene,
+					'page' => self::$shared_page,
+				];
+			}
 		}
+
+		$this->page = self::$shared_page;
 	}
 
 	/**
@@ -252,6 +263,30 @@ class Playwright implements Driver {
 	 */
 	public function is_enabled(string $selector, ?string $within = null): bool {
 		return $this->first($selector, $within)->isEnabled();
+	}
+
+	/**
+	 * Select an option of a native select by value
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param string $value
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_value(string $selector, string $value, ?string $within = null): void {
+		$this->first($selector, $within)->selectOption([ 'value' => $value ]);
+	}
+
+	/**
+	 * Select an option of a native select by index (0-based)
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param int $index
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_index(string $selector, int $index, ?string $within = null): void {
+		$this->first($selector, $within)->selectOption([ 'index' => $index ]);
 	}
 
 	/**
@@ -517,7 +552,7 @@ class Playwright implements Driver {
 			}
 
 			foreach (self::$traced_pages as $traced_page) {
-				$trace_file = Config::$playwright_trace_path . '/' . $traced_page['scene'] . '-' . $traced_page['page_class'] . '-' . self::$trace_counter . '.zip';
+				$trace_file = Config::$playwright_trace_path . '/' . $traced_page['scene'] . '-' . self::$trace_counter . '.zip';
 				self::$trace_counter++;
 
 				try {
@@ -529,6 +564,8 @@ class Playwright implements Driver {
 		}
 
 		self::$traced_pages = [];
+
+		self::$shared_page = null;
 
 		if (self::$context !== null) {
 			self::$context->close();

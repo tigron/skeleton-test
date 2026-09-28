@@ -148,6 +148,26 @@ interface Driver {
 	public function is_enabled(string $selector, ?string $within = null): bool;
 
 	/**
+	 * Select an option of a native select by value
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param string $value
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_value(string $selector, string $value, ?string $within = null): void;
+
+	/**
+	 * Select an option of a native select by index (0-based)
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the select element
+	 * @param int $index
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function select_option_by_index(string $selector, int $index, ?string $within = null): void;
+
+	/**
 	 * Count the elements matching a selector
 	 *
 	 * @access public
