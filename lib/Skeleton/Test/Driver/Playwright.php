@@ -567,18 +567,29 @@ class Playwright implements Driver {
 
 		self::$shared_page = null;
 
+		// best-effort teardown: a dead transport must not leave half-reset
+		// statics behind for the next scene
 		if (self::$context !== null) {
-			self::$context->close();
+			try {
+				self::$context->close();
+			} catch (\Throwable $e) {
+			}
 			self::$context = null;
 		}
 
 		if (self::$browser !== null) {
-			self::$browser->close();
+			try {
+				self::$browser->close();
+			} catch (\Throwable $e) {
+			}
 			self::$browser = null;
 		}
 
 		if (self::$playwright !== null) {
-			self::$playwright->close();
+			try {
+				self::$playwright->close();
+			} catch (\Throwable $e) {
+			}
 			self::$playwright = null;
 		}
 	}
@@ -593,7 +604,9 @@ class Playwright implements Driver {
 			putenv('PLAYWRIGHT_NODE_PATH=' . Config::$node_path);
 		}
 
-		$config = PlaywrightConfigBuilder::create()->build();
+		$config = PlaywrightConfigBuilder::create()
+			->withTimeoutMs(86400000)
+			->build();
 
 		self::$playwright = PlaywrightFactory::create($config);
 
