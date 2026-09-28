@@ -11,6 +11,7 @@
 namespace Skeleton\Test\Driver;
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Skeleton\Test\Config;
 use Skeleton\Test\Driver;
 use Skeleton\Test\Page\Elementnotfound;
@@ -84,7 +85,9 @@ class Selenium implements Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function click(string $selector, ?string $within = null): void {
-		$this->find_element($selector, $within, Config::$default_implicit_timeout)->click();
+		$this->element_action(function () use ($selector, $within) {
+			$this->find_element($selector, $within, Config::$default_implicit_timeout)->click();
+		}, $selector, $within);
 	}
 
 	/**
@@ -96,9 +99,11 @@ class Selenium implements Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function fill(string $selector, string $value, ?string $within = null): void {
-		$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
-		$element->clear();
-		$element->sendKeys($value);
+		$this->element_action(function () use ($selector, $value, $within) {
+			$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
+			$element->clear();
+			$element->sendKeys($value);
+		}, $selector, $within);
 	}
 
 	/**
@@ -110,7 +115,9 @@ class Selenium implements Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function send_keys(string $selector, string $keys, ?string $within = null): void {
-		$this->find_element($selector, $within, Config::$default_implicit_timeout)->sendKeys($keys);
+		$this->element_action(function () use ($selector, $keys, $within) {
+			$this->find_element($selector, $within, Config::$default_implicit_timeout)->sendKeys($keys);
+		}, $selector, $within);
 	}
 
 	/**
@@ -121,7 +128,9 @@ class Selenium implements Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function clear(string $selector, ?string $within = null): void {
-		$this->find_element($selector, $within, Config::$default_implicit_timeout)->clear();
+		$this->element_action(function () use ($selector, $within) {
+			$this->find_element($selector, $within, Config::$default_implicit_timeout)->clear();
+		}, $selector, $within);
 	}
 
 	/**
@@ -133,7 +142,9 @@ class Selenium implements Driver {
 	 * @return string
 	 */
 	public function get_text(string $selector, ?string $within = null): string {
-		return $this->find_element($selector, $within, Config::$default_implicit_timeout)->getText();
+		return $this->element_action(function () use ($selector, $within) {
+			return $this->find_element($selector, $within, Config::$default_implicit_timeout)->getText();
+		}, $selector, $within);
 	}
 
 	/**
@@ -146,7 +157,9 @@ class Selenium implements Driver {
 	 * @return string|null
 	 */
 	public function get_attribute(string $selector, string $attribute, ?string $within = null): ?string {
-		return $this->find_element($selector, $within, Config::$default_implicit_timeout)->getAttribute($attribute);
+		return $this->element_action(function () use ($selector, $attribute, $within) {
+			return $this->find_element($selector, $within, Config::$default_implicit_timeout)->getAttribute($attribute);
+		}, $selector, $within);
 	}
 
 	/**
@@ -161,6 +174,8 @@ class Selenium implements Driver {
 		try {
 			return $this->find_element($selector, $within, 0)->isDisplayed();
 		} catch (Elementnotfound $e) {
+			return false;
+		} catch (StaleElementReferenceException $e) {
 			return false;
 		}
 	}
@@ -178,6 +193,8 @@ class Selenium implements Driver {
 			return $this->find_element($selector, $within, 0)->isSelected();
 		} catch (Elementnotfound $e) {
 			return false;
+		} catch (StaleElementReferenceException $e) {
+			return false;
 		}
 	}
 
@@ -194,6 +211,8 @@ class Selenium implements Driver {
 			return $this->find_element($selector, $within, 0)->isEnabled();
 		} catch (Elementnotfound $e) {
 			return false;
+		} catch (StaleElementReferenceException $e) {
+			return false;
 		}
 	}
 
@@ -207,7 +226,11 @@ class Selenium implements Driver {
 	 */
 	public function count(string $selector, ?string $within = null): int {
 		if ($within !== null) {
-			return count($this->find_element($within)->findElements(Selector::to_by($selector)));
+			try {
+				return count($this->find_element($within)->findElements(Selector::to_by($selector)));
+			} catch (StaleElementReferenceException $e) {
+				return 0;
+			}
 		}
 
 		return count($this->webdriver->findElements(Selector::to_by($selector)));
@@ -221,8 +244,10 @@ class Selenium implements Driver {
 	 * @param string|null $within selector of a parent element to search in
 	 */
 	public function hover(string $selector, ?string $within = null): void {
-		$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
-		$this->webdriver->action()->moveToElement($element)->perform();
+		$this->element_action(function () use ($selector, $within) {
+			$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
+			$this->webdriver->action()->moveToElement($element)->perform();
+		}, $selector, $within);
 	}
 
 	/**
@@ -346,6 +371,30 @@ class Selenium implements Driver {
 	 */
 	public function native(): Webdriver {
 		return $this->webdriver;
+	}
+
+	/**
+	 * Run an element action, retrying once on a stale element reference
+	 *
+	 * The retry re-finds the element by selector. A repeated failure is
+	 * reported as Elementnotfound.
+	 *
+	 * @access private
+	 * @param callable $action
+	 * @param string $selector
+	 * @param string|null $within
+	 * @return mixed
+	 */
+	private function element_action(callable $action, string $selector, ?string $within = null): mixed {
+		try {
+			return $action();
+		} catch (StaleElementReferenceException $e) {
+			try {
+				return $action();
+			} catch (StaleElementReferenceException $e2) {
+				throw new Elementnotfound('Element went stale repeatedly: ' . $selector . ($within !== null ? ' within ' . $within : ''));
+			}
+		}
 	}
 
 	/**
