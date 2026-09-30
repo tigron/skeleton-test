@@ -304,6 +304,18 @@ abstract class Page {
 	}
 
 	/**
+	 * Drag an element onto another element
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the element to drag
+	 * @param string $target css or xpath selector of the element to drop on
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function drag_and_drop(string $selector, string $target, ?string $within = null): void {
+		$this->driver->drag_and_drop($selector, $target, $within);
+	}
+
+	/**
 	 * Execute javascript in the browser
 	 *
 	 * The script is given in body style (as in selenium executeScript): it

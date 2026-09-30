@@ -297,6 +297,22 @@ class Selenium implements Driver {
 	}
 
 	/**
+	 * Drag an element onto another element
+	 *
+	 * @access public
+	 * @param string $selector css or xpath selector of the element to drag
+	 * @param string $target css or xpath selector of the element to drop on
+	 * @param string|null $within selector of a parent element to search in
+	 */
+	public function drag_and_drop(string $selector, string $target, ?string $within = null): void {
+		$this->element_action(function () use ($selector, $target, $within) {
+			$element = $this->find_element($selector, $within, Config::$default_implicit_timeout);
+			$target_element = $this->find_element($target, $within, Config::$default_implicit_timeout);
+			$this->webdriver->action()->dragAndDrop($element, $target_element)->perform();
+		}, $selector, $within);
+	}
+
+	/**
 	 * Execute javascript in the browser
 	 *
 	 * @access public
