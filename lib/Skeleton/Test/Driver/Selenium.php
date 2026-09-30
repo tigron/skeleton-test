@@ -36,7 +36,22 @@ class Selenium implements Driver {
 	 * @access public
 	 */
 	public function __construct() {
-		$this->webdriver = Webdriver::initiate();
+		// The hub of a freshly started selenium container reports ready
+		// before its nodes are registered; wait for a node instead of
+		// failing the scene.
+		$attempts = 12;
+		while (true) {
+			try {
+				$this->webdriver = Webdriver::initiate();
+				break;
+			} catch (\Facebook\WebDriver\Exception\UnknownErrorException $e) {
+				$attempts--;
+				if ($attempts === 0) {
+					throw $e;
+				}
+				sleep(5);
+			}
+		}
 	}
 
 	/**
