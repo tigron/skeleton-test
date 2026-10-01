@@ -27,14 +27,14 @@ class Test_List extends \Skeleton\Console\Command {
 	protected function configure() {
 		$this->setName('test:list');
 		$this->setDescription('List the scene classes declared for a driver');
-		$this->addArgument('driver', InputArgument::REQUIRED, 'Driver to list scenes for (playwright, selenium or driverless)');
+		$this->addArgument('driver', InputArgument::REQUIRED, 'Driver to list scenes for (playwright, selenium or headless)');
 	}
 
 	/**
 	 * Execute the Command
 	 *
 	 * Scenes declaring a driver are listed for that driver. Scenes without
-	 * a driver declaration are driverless: they never touch a browser and
+	 * a driver declaration are headless: they never touch a browser and
 	 * can run on plain php + database infrastructure.
 	 *
 	 * @access protected
@@ -43,7 +43,7 @@ class Test_List extends \Skeleton\Console\Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$driver = $input->getArgument('driver');
-		if (!in_array($driver, [ 'playwright', 'selenium', 'driverless' ])) {
+		if (!in_array($driver, [ 'playwright', 'selenium', 'headless' ])) {
 			$output->writeln('<error>Unknown driver: ' . $driver . '</error>');
 			return 1;
 		}
@@ -66,7 +66,7 @@ class Test_List extends \Skeleton\Console\Command {
 			if (preg_match("/static\s+\\\$driver\s*=\s*'([a-z]+)'/", $contents, $matches)) {
 				$scene_driver = $matches[1];
 			} else {
-				$scene_driver = 'driverless';
+				$scene_driver = 'headless';
 			}
 			if ($scene_driver === $driver) {
 				$scenes[] = $scene;
