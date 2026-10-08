@@ -2,37 +2,27 @@
 /**
  * Skeleton\Test\Unit class
  *
+ * Base class for scenes
+ *
  * @author Christophe Gosiau <christophe@tigron.be>
  * @author Gerry Demaret <gerry@tigron.be>
  * @author Lionel Laffineur <lionel@tigron.be>
  */
 
 namespace Skeleton\Test;
-use Facebook\WebDriver\WebDriverBy;
+
+use Skeleton\Test\Exception\Timingfilenotfound;
 
 class Unit extends \PHPUnit\Framework\TestCase {
 
 	/**
-	 * The webdriver variable
+	 * Driver used by the pages of this scene
+	 * Defaults to Config::$driver when not set
 	 *
-	 * @access public
-	 * @var Facebook\WebDriver\Remote\RemoteWebDriver $webdriver
+	 * @access protected
+	 * @var string|null $driver
 	 */
-	private static $my_webdriver = null;
-
-	/**
-	 * Catch calls to the "webdriver" property and proxy them to our
-	 * get_webdriver() method.
-	 *
-	 * @access public
-	 * @param string $key
-	 * @return mixed
-	 */
-	public function __get($key) {
-		if ($key === 'webdriver') {
-			return self::get_webdriver();
-		}
-	}
+	protected static $driver = null;
 
 	/**
 	 * setupBeforeScene
@@ -40,7 +30,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	 *
 	 * @access public
 	 */
-	public static function setupBeforeScene() {
+	public static function setupBeforeScene(): void {
 	}
 
 	/**
@@ -51,32 +41,13 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	public static function setUpBeforeClass(): void {
 		$class = get_called_class();
 
-		if (isset(Config::$start_timestamp_filename)) {
-			if (!file_exists(Config::$start_timestamp_filename)) {
-				throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
-			}
-			$timestamp = round(time() - intval(file_get_contents(Config::$start_timestamp_filename)));
-			$hours = floor($timestamp / 3600);
-			$minutes = floor(($timestamp % 3600) / 60);
-			$seconds = $timestamp % 60;
-			$time = sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
-			$timings = [];
-			if (file_exists(Config::$timings_filename)) {
-				$timings = json_decode(file_get_contents(Config::$timings_filename), true);
-			}
-			$data = [];
-			if (isset($timings[$class])) {
-				$data = $timings[$class];
-			}
-			$data['start_timestamp'] = $timestamp;
-			$data['start_time'] = $time;
-			$timings[$class] = $data;
-			file_put_contents(Config::$timings_filename, json_encode($timings, JSON_PRETTY_PRINT));
-		}
+		Page::begin_scene($class, static::$driver);
+
+		self::record_timing('start');
 
 		try {
 			$class::setupBeforeScene();
-		} catch(\Exception $e) {
+		} catch (\Exception $e) {
 			printf("Error in %s::setupBeforeScene(): %s\n%s\n", $class, $e->getMessage(), $e->getTraceAsString());
 		}
 	}
@@ -87,7 +58,7 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	 *
 	 * @access public
 	 */
-	public static function tearDownAfterScene() {
+	public static function tearDownAfterScene(): void {
 	}
 
 	/**
@@ -96,31 +67,10 @@ class Unit extends \PHPUnit\Framework\TestCase {
 	 *
 	 * @access public
 	 */
-	public static function tearDownAfterClass():void {
+	public static function tearDownAfterClass(): void {
 		$class = get_called_class();
 
-		if (isset(Config::$start_timestamp_filename)) {
-			if (!file_exists(Config::$start_timestamp_filename)) {
-				throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
-			}
-			$timestamp = round(time() - intval(file_get_contents(Config::$start_timestamp_filename)));
-			$hours = floor($timestamp / 3600);
-			$minutes = floor(($timestamp % 3600) / 60);
-			$seconds = $timestamp % 60;
-			$time = sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
-			$timings = [];
-			if (file_exists(Config::$timings_filename)) {
-				$timings = json_decode(file_get_contents(Config::$timings_filename), true);
-			}
-			$data = [];
-			if (isset($timings[$class])) {
-				$data = $timings[$class];
-			}
-			$data['stop_timestamp'] = $timestamp;
-			$data['stop_time'] = $time;
-			$timings[$class] = $data;
-			file_put_contents(Config::$timings_filename, json_encode($timings, JSON_PRETTY_PRINT));
-		}
+		self::record_timing('stop');
 
 		try {
 			$class::tearDownAfterScene();
@@ -128,9 +78,52 @@ class Unit extends \PHPUnit\Framework\TestCase {
 			printf("Error in %s::tearDownAfterScene(): %s\n%s\n", $class, $e->getMessage(), $e->getTraceAsString());
 		}
 
-		if (self::$my_webdriver !== null) {
-			self::$my_webdriver->quit();
-			self::$my_webdriver = null;
+		\Skeleton\Test\Driver\Selenium::quit_all();
+		\Skeleton\Test\Driver\Playwright::close_all();
+		Page::end_scene();
+	}
+
+	/**
+	 * Record a timing entry for the current scene
+	 *
+	 * @access private
+	 * @param string $event 'start' or 'stop'
+	 * @throws Timingfilenotfound when the start timestamp file is missing
+	 */
+	private static function record_timing(string $event): void {
+		if (Config::$start_timestamp_filename === null || Config::$timings_filename === null) {
+			return;
 		}
+
+		if (!file_exists(Config::$start_timestamp_filename)) {
+			if ($event !== 'start') {
+				throw new Timingfilenotfound('Timing file ' . Config::$start_timestamp_filename . ' was not found.');
+			}
+
+			file_put_contents(Config::$start_timestamp_filename, strval(time()));
+		}
+
+		$class = get_called_class();
+
+		$timestamp = round(time() - intval(file_get_contents(Config::$start_timestamp_filename)));
+		$hours = floor($timestamp / 3600);
+		$minutes = floor(($timestamp % 3600) / 60);
+		$seconds = $timestamp % 60;
+		$time = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+
+		$timings = [];
+		if (is_file(Config::$timings_filename)) {
+			$decoded = json_decode(file_get_contents(Config::$timings_filename), true);
+			if (is_array($decoded)) {
+				$timings = $decoded;
+			}
+		}
+
+		$data = $timings[$class] ?? [];
+		$data[$event . '_timestamp'] = $timestamp;
+		$data[$event . '_time'] = $time;
+		$timings[$class] = $data;
+
+		file_put_contents(Config::$timings_filename, json_encode($timings, JSON_PRETTY_PRINT));
 	}
 }

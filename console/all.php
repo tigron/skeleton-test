@@ -1,6 +1,6 @@
 <?php
 /**
- * migration:run command for Skeleton Console
+ * test:all command for Skeleton Console
  *
  * @author David Vandemaele <david@tigron.be>
  */
@@ -42,7 +42,7 @@ class Test_All extends \Skeleton\Console\Command {
 			return 1;
 		}
 
-		$phpunit = new \PHPUnit\TextUI\TestRunner;
+		$phpunit = new \PHPUnit\TextUI\TestRunner();
 		$arguments = [
 			'colors' => 'always',
 			'verbose' => false,
@@ -58,32 +58,9 @@ class Test_All extends \Skeleton\Console\Command {
 			$arguments['printer'] = new \Skeleton\Test\Printer(null, false, 'always', false, 150);
 		}
 
+		\Skeleton\Test\Loader::register_autoloader(\Skeleton\Test\Config::$test_path);
 
-		$declared_classes = get_declared_classes();
-
-		// Load classes inside the given folder:
-		$dir_iterator = new \RecursiveDirectoryIterator(\Skeleton\Test\Config::$test_path);
-		$iterator = new \RecursiveIteratorIterator($dir_iterator, \RecursiveIteratorIterator::SELF_FIRST);
-
-		foreach ($iterator as $file) {
-			$filename = $file->getFilename();
-			if ($filename[0] == '.') {
-				continue;
-			}
-			if (is_dir($file->getPathname())) {
-				continue;
-			}
-		    require_once $file->getPathname();
-		}
-
-		$scenes = array_diff(get_declared_classes(), $declared_classes);
-
-		foreach ($scenes as $key => $scene) {
-			if (strpos($scene, 'Scene_') !== 0) {
-				unset($scenes[$key]);
-			}
-		}
-		sort($scenes);
+		$scenes = \Skeleton\Test\Loader::get_scenes(\Skeleton\Test\Config::$test_path);
 
 		$suite = new \PHPUnit\Framework\TestSuite();
 		foreach ($scenes as $scene) {
@@ -91,7 +68,6 @@ class Test_All extends \Skeleton\Console\Command {
 		}
 
 		$test_results = $phpunit->run($suite, $arguments);
-		return 0;
+		return $test_results->wasSuccessful() ? 0 : 1;
 	}
-
 }

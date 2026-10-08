@@ -24,7 +24,6 @@ class Test_Run extends \Skeleton\Console\Command {
 		$this->setDescription('Run a test');
 		$this->addArgument('name', InputArgument::REQUIRED, 'Name of the test');
 		$this->addOption('disable-pretty-printer', null, InputOption::VALUE_NONE, 'Disable PHPUnit\'s PrettyResultPrinter');
-
 	}
 
 	/**
@@ -60,13 +59,15 @@ class Test_Run extends \Skeleton\Console\Command {
 			$arguments['printer'] = new \Skeleton\Test\Printer(null, false, 'always', false, 150);
 		}
 
+		\Skeleton\Test\Loader::register_autoloader(\Skeleton\Test\Config::$test_path);
+
 		$suite = new \PHPUnit\Framework\TestSuite();
 		$names = explode(',', $input->getArgument('name'));
 		foreach ($names as $name) {
-			$suite->addTestSuite($name);
+			$suite->addTestSuite(trim($name));
 		}
 
 		$test_results = $phpunit->run($suite, $arguments);
-		return 0;
+		return $test_results->wasSuccessful() ? 0 : 1;
 	}
 }
